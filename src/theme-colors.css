@@ -1,0 +1,8 @@
+.theme-blue .text-primary, .theme-blue .border-primary, .theme-blue .bg-primary { color: #0d6efd !important; border-color: #0d6efd !important; background-color: #0d6efd !important; }
+.theme-green .text-primary, .theme-green .border-primary, .theme-green .bg-primary { color: #00b894 !important; border-color: #00b894 !important; background-color: #00b894 !important; }
+.theme-orange .text-primary, .theme-orange .border-primary, .theme-orange .bg-primary { color: #fd7e14 !important; border-color: #fd7e14 !important; background-color: #fd7e14 !important; }
+.theme-violet .text-primary, .theme-violet .border-primary, .theme-violet .bg-primary { color: #6f42c1 !important; border-color: #6f42c1 !important; background-color: #6f42c1 !important; }
+.theme-blue .btn-primary { background-color: #0d6efd; border-color: #0d6efd; }
+.theme-green .btn-primary { background-color: #00b894; border-color: #00b894; }
+.theme-orange .btn-primary { background-color: #fd7e14; border-color: #fd7e14; }
+.theme-violet .btn-primary { background-color: #6f42c1; border-color: #6f42c1; }
