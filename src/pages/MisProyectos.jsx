@@ -110,14 +110,6 @@ const MisProyectos = () => {
             >
               Mis Proyectos
             </h2>
-            <Link
-              to="/dashboard"
-              className={
-                darkMode ? "btn btn-outline-info mt-3 mt-md-0" : "btn btn-outline-primary mt-3 mt-md-0"
-              }
-            >
-              <i className="bi bi-house"></i> Home
-            </Link>
           </div>
           <div
             className="row w-100 justify-content-center g-3"

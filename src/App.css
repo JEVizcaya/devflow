@@ -67,3 +67,60 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Switch personalizado para modo oscuro en NavBar */
+.devflow-switch-label {
+  color: #212529;
+  transition: color 0.2s;
+}
+body.dark .devflow-switch-label,
+.bg-dark .devflow-switch-label,
+.text-light .devflow-switch-label,
+.theme-dark .devflow-switch-label,
+.dark .devflow-switch-label {
+  color: #fff !important;
+}
+.devflow-switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  margin-bottom: 0;
+}
+.devflow-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.devflow-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ccc;
+  transition: background 0.2s;
+  border-radius: 24px;
+}
+.devflow-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  transition: transform 0.2s;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px #0002;
+}
+.devflow-switch input:checked + .devflow-slider {
+  background: #0dcaf0;
+}
+.devflow-switch input:checked + .devflow-slider:before {
+  transform: translateX(18px);
+}
+.devflow-slider:active:before {
+  width: 20px;
+}

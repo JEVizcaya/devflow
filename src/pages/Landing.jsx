@@ -35,7 +35,7 @@ const Landing = ({ setToast }) => {
       }
       style={darkMode ? darkBg : lightBg}
     >
-      <NavBar />
+      <NavBar showDarkSwitchOnly />
       <main className="flex-grow-1 d-flex flex-column align-items-center justify-content-center w-100" style={{maxWidth: 900}}>
         <section className={
           `rounded-4 shadow-lg p-4 p-md-5 text-center mb-4 w-100 ` +
@@ -54,27 +54,27 @@ const Landing = ({ setToast }) => {
         </section>
         <section className="row w-100 justify-content-center mt-4" style={{maxWidth: 900}}>
           <div className="col-12 col-md-4 mb-3">
-            <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)'} : {}}>
+            <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)', borderColor: '#0dcaf0'} : {}}>
               <div className="card-body">
-                <i className="bi bi-diagram-3 fs-1 mb-3 text-info"></i>
+                <i className={darkMode ? "bi bi-diagram-3 fs-1 mb-3 text-info" : "bi bi-diagram-3 fs-1 mb-3 text-primary"}></i>
                 <h5 className="card-title fw-bold">Proyectos</h5>
                 <p className="card-text">Visualiza y gestiona tus proyectos en un solo lugar.</p>
               </div>
             </div>
           </div>
           <div className="col-12 col-md-4 mb-3">
-            <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)'} : {}}>
+            <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)', borderColor: '#0dcaf0'} : {}}>
               <div className="card-body">
-                <i className="bi bi-people fs-1 mb-3 text-info"></i>
+                <i className={darkMode ? "bi bi-people fs-1 mb-3 text-info" : "bi bi-people fs-1 mb-3 text-primary"}></i>
                 <h5 className="card-title fw-bold">Colabora fácilmente</h5>
                 <p className="card-text">Invita a otros, comenta y mejora los procesos de desarrollo en tiempo real.</p>
               </div>
             </div>
           </div>
           <div className="col-12 col-md-4 mb-3">
-            <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)'} : {}}>
+            <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)', borderColor: '#0dcaf0'} : {}}>
               <div className="card-body">
-                <i className="bi bi-github fs-1 mb-3 text-info"></i>
+                <i className={darkMode ? "bi bi-github fs-1 mb-3 text-info" : "bi bi-github fs-1 mb-3 text-primary"}></i>
                 <h5 className="card-title fw-bold">Integración GitHub</h5>
                 <p className="card-text">Accede de forma segura y conecta tus flujos con tus repositorios GitHub.</p>
               </div>
