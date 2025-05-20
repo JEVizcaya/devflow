@@ -57,8 +57,8 @@ const Landing = ({ setToast }) => {
             <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)'} : {}}>
               <div className="card-body">
                 <i className="bi bi-diagram-3 fs-1 mb-3 text-info"></i>
-                <h5 className="card-title fw-bold">Visualiza procesos</h5>
-                <p className="card-text">Crea diagramas claros de tus flujos de trabajo y compártelos con tu equipo.</p>
+                <h5 className="card-title fw-bold">Proyectos</h5>
+                <p className="card-text">Visualiza y gestiona tus proyectos en un solo lugar.</p>
               </div>
             </div>
           </div>

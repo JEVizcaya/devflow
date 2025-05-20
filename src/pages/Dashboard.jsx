@@ -42,7 +42,7 @@ const Dashboard = ({ setToast }) => {
           `rounded-4 shadow-lg p-3 p-md-5 text-center mb-4 w-100 ` +
           (darkMode ? "bg-dark bg-opacity-75 border border-info text-light" : "bg-white border border-primary text-dark")
         }
-        style={{ width: '100%', maxWidth: 600, minWidth: 0, backdropFilter: darkMode ? 'blur(2px)' : undefined }}>
+          style={{ width: '100%', maxWidth: 600, minWidth: 0, backdropFilter: darkMode ? 'blur(2px)' : undefined }}>
           {user && (
             <>
               <img
@@ -52,7 +52,7 @@ const Dashboard = ({ setToast }) => {
                 className={darkMode ? "mb-3 border border-3 border-info" : "mb-3 border border-3 border-primary"}
               />
               <h2 className={darkMode ? "fw-bold text-info mb-2" : "fw-bold text-primary mb-2"}>
-                ¡Hola, {user.displayName || user.email}!
+                ¡Hola, @{user.reloadUserInfo && user.reloadUserInfo.screenName ? user.reloadUserInfo.screenName : user.email.split("@")[0]}!
               </h2>
               <p className={darkMode ? "lead text-light-50 mb-4" : "lead text-muted mb-4"}>
                 Bienvenido a tu espacio de trabajo colaborativo.<br />
@@ -66,13 +66,18 @@ const Dashboard = ({ setToast }) => {
         </section>
         <section className="row w-100 justify-content-center mt-4 g-3" style={{ width: '100%', maxWidth: 900, minWidth: 0, marginLeft: 0, marginRight: 0 }}>
           <div className="col-12 col-sm-6 col-lg-4 mb-3 d-flex">
-            <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow flex-fill" : "card bg-white text-dark border-primary h-100 shadow-sm flex-fill"} style={darkMode ? { backdropFilter: 'blur(1.5px)' } : {}}>
-              <div className="card-body">
-                <i className="bi bi-diagram-3 fs-1 mb-3 text-info"></i>
-                <h5 className="card-title fw-bold">Tus flujos</h5>
-                <p className="card-text">Crea y organiza diagramas de procesos, tareas y pipelines de desarrollo.</p>
+            <Link
+              to="/mis-proyectos"
+              className="text-decoration-none flex-fill"
+            >
+              <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? { backdropFilter: 'blur(1.5px)' } : {}}>
+                <div className="card-body">
+                  <i className="bi bi-folder2-open fs-1 mb-3 text-info"></i>
+                  <h5 className="card-title fw-bold">Mis proyectos</h5>
+                  <p className="card-text">Visualiza y gestiona tus proyectos de desarrollo en un solo lugar. Accede a detalles, repositorios y privacidad.</p>
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
           <div className="col-12 col-sm-6 col-lg-4 mb-3 d-flex">
             <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow flex-fill" : "card bg-white text-dark border-primary h-100 shadow-sm flex-fill"} style={darkMode ? { backdropFilter: 'blur(1.5px)' } : {}}>

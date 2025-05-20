@@ -45,7 +45,9 @@ const NavBar = ({ onLogout }) => {
         {user && (
           <div className="d-flex align-items-center gap-2">
             <img src={user.photoURL} alt="avatar" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", border: darkMode ? "2px solid #0dcaf0" : "2px solid #0d6efd" }} />
-            <span className={darkMode ? "text-light fw-semibold" : "text-dark fw-semibold"} style={{fontSize: 15}}>{user.displayName || user.email}</span>
+            <span className={darkMode ? "text-light fw-semibold" : "text-dark fw-semibold"} style={{fontSize: 15}}>
+              {user.reloadUserInfo && user.reloadUserInfo.screenName ? user.reloadUserInfo.screenName : user.email.split("@")[0]}
+            </span>
           </div>
         )}
         <button className={darkMode ? "btn btn-outline-info btn-sm" : "btn btn-outline-primary btn-sm"} onClick={toggleDarkMode}>

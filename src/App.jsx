@@ -9,6 +9,7 @@ import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
 import CrearProyecto from "./pages/CrearProyecto";
 import Toast from "./components/Toast";
+import MisProyectos from "./pages/MisProyectos";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -34,6 +35,7 @@ function App() {
           <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Landing setToast={setToast} />} />
           <Route path="/dashboard" element={user ? <Dashboard setToast={setToast} /> : <Navigate to="/" />} />
           <Route path="/crear-proyecto" element={user ? <CrearProyecto setToast={setToast} /> : <Navigate to="/" />} />
+          <Route path="/mis-proyectos" element={<MisProyectos />} />
         </Routes>
       </Router>
     </DarkModeProvider>
