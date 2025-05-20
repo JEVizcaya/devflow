@@ -3,6 +3,7 @@ import logo from "../assets/landing-illustration.svg";
 import { signInWithGitHub } from "../firebase/auth";
 import { useDarkMode } from "../contex/DarkModeContext";
 import NavBar from "../components/NavBar";
+import { Link } from "react-router-dom";
 
 const Landing = ({ setToast }) => {
   const { darkMode, setDarkMode } = useDarkMode();
@@ -54,32 +55,19 @@ const Landing = ({ setToast }) => {
         </section>
         <section className="row w-100 justify-content-center mt-4" style={{maxWidth: 900}}>
           <div className="col-12 col-md-4 mb-3">
-            <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)', borderColor: '#0dcaf0'} : {}}>
-              <div className="card-body">
-                <i className={darkMode ? "bi bi-diagram-3 fs-1 mb-3 text-info" : "bi bi-diagram-3 fs-1 mb-3 text-primary"}></i>
-                <h5 className="card-title fw-bold">Proyectos</h5>
-                <p className="card-text">Visualiza y gestiona tus proyectos en un solo lugar.</p>
+            <Link to="/proyectos-publicos" style={{ textDecoration: 'none' }}>
+              <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)', borderColor: '#0dcaf0'} : {}}>
+                <div className="card-body">
+                  <i className={darkMode ? "bi bi-diagram-3 fs-1 mb-3 text-info" : "bi bi-diagram-3 fs-1 mb-3 text-primary"}></i>
+                  <h5 className="card-title fw-bold">Proyectos Disponibles</h5>
+                  <p className="card-text">
+                    Explora y colabora en proyectos de desarrollo de software. Con DevFlow, puedes acceder a una variedad de flujos de trabajo y contribuir a su mejora.
+                  </p>
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
-          <div className="col-12 col-md-4 mb-3">
-            <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)', borderColor: '#0dcaf0'} : {}}>
-              <div className="card-body">
-                <i className={darkMode ? "bi bi-people fs-1 mb-3 text-info" : "bi bi-people fs-1 mb-3 text-primary"}></i>
-                <h5 className="card-title fw-bold">Colabora fácilmente</h5>
-                <p className="card-text">Invita a otros, comenta y mejora los procesos de desarrollo en tiempo real.</p>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 col-md-4 mb-3">
-            <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)', borderColor: '#0dcaf0'} : {}}>
-              <div className="card-body">
-                <i className={darkMode ? "bi bi-github fs-1 mb-3 text-info" : "bi bi-github fs-1 mb-3 text-primary"}></i>
-                <h5 className="card-title fw-bold">Integración GitHub</h5>
-                <p className="card-text">Accede de forma segura y conecta tus flujos con tus repositorios GitHub.</p>
-              </div>
-            </div>
-          </div>
+          
         </section>
       </main>
       <footer className="w-100 text-center py-3 mt-4" style={{fontSize: 14, opacity: 0.7}}>

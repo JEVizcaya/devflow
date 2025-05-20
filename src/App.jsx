@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from "firebase/auth";
 import './App.css'
 import "./App.animations.css";
 import "./theme-colors.css";
@@ -10,6 +10,9 @@ import Dashboard from "./pages/Dashboard";
 import CrearProyecto from "./pages/CrearProyecto";
 import Toast from "./components/Toast";
 import MisProyectos from "./pages/MisProyectos";
+import EditarProyecto from "./pages/EditarProyecto";
+import { saveUserProfile } from "./firebase/firestore";
+import ProyectosPublicos from "./pages/ProyectosPublicos";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -18,14 +21,28 @@ function App() {
 
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-      setLoading(false);
+    setPersistence(auth, browserLocalPersistence).then(() => {
+      const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+        setUser(firebaseUser);
+        setLoading(false);
+        if (firebaseUser) {
+          await saveUserProfile(firebaseUser);
+        }
+      });
+      return unsubscribe;
     });
-    return () => unsubscribe();
   }, []);
 
   if (loading) return <div className="container d-flex justify-content-center align-items-center min-vh-100"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Cargando...</span></div></div>;
+
+  // En handleLogout, forzar cierre de sesión y limpiar sesión
+  const handleLogout = async () => {
+    const auth = getAuth();
+    await auth.signOut();
+    setUser(null);
+    setToast && setToast({ message: "Sesión cerrada", type: "success" });
+    navigate("/");
+  };
 
   return (
     <DarkModeProvider>
@@ -36,6 +53,8 @@ function App() {
           <Route path="/dashboard" element={user ? <Dashboard setToast={setToast} /> : <Navigate to="/" />} />
           <Route path="/crear-proyecto" element={user ? <CrearProyecto setToast={setToast} /> : <Navigate to="/" />} />
           <Route path="/mis-proyectos" element={<MisProyectos />} />
+          <Route path="/editar-proyecto/:ownerId/:projectId" element={<EditarProyecto />} />
+          <Route path="/proyectos-publicos" element={<ProyectosPublicos />} />
         </Routes>
       </Router>
     </DarkModeProvider>

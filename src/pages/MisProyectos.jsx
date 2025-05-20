@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getFirestore, collection, collectionGroup, getDocs } from "firebase/firestore";
+import { getUserProfile } from "../firebase/firestore";
 import NavBar from "../components/NavBar";
 import { useDarkMode } from "../contex/DarkModeContext";
 import { Link } from "react-router-dom";
+import Toast from "../components/Toast";
 
 const MisProyectos = () => {
   const [proyectos, setProyectos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [usuarios, setUsuarios] = useState([]);
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState("");
+  const [toast, setToast] = useState(null);
   const auth = getAuth();
   const user = auth.currentUser;
   const db = getFirestore();
@@ -27,19 +31,16 @@ const MisProyectos = () => {
   };
 
   useEffect(() => {
-    if (!user) {
-      setError("No estás autenticado");
-      setLoading(false);
-      return;
-    }
-
-    const fetchProyectos = async () => {
+    const fetchProyectosYUsuarios = async () => {
+      setLoading(true);
       try {
-        const projectsRef = collection(db, "users", user.uid, "projects");
+        // Traer todos los proyectos de todos los usuarios
+        const projectsRef = collectionGroup(db, "projects");
         const querySnapshot = await getDocs(projectsRef);
         let proyectosData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
+          ownerId: doc.ref.parent.parent.id,
         }));
         proyectosData = proyectosData.sort((a, b) => {
           const getTime = (p) => {
@@ -50,15 +51,18 @@ const MisProyectos = () => {
           return getTime(b) - getTime(a);
         });
         setProyectos(proyectosData);
+        // Obtener usuarios únicos
+        const uids = Array.from(new Set(proyectosData.map(p => p.ownerId)));
+        const usuariosData = await Promise.all(uids.map(uid => getUserProfile(uid)));
+        setUsuarios(usuariosData.filter(Boolean));
       } catch (e) {
         setError("Error al cargar proyectos");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchProyectos();
-  }, [user, db]);
+    fetchProyectosYUsuarios();
+  }, [db]);
 
   if (loading)
     return (
@@ -108,96 +112,137 @@ const MisProyectos = () => {
               }
               style={{ marginBottom: 0 }}
             >
-              Mis Proyectos
+              Proyectos
             </h2>
+            <select
+              className="form-select w-auto mt-3 mt-md-0"
+              value={usuarioSeleccionado}
+              onChange={e => setUsuarioSeleccionado(e.target.value)}
+              style={{ minWidth: 180 }}
+            >
+              <option value="">Todos los usuarios</option>
+              {usuarios.map(u => (
+                <option key={u.uid} value={u.uid}>
+                  {u.displayName || u.githubUsername || u.email}
+                </option>
+              ))}
+            </select>
           </div>
           <div
             className="row w-100 justify-content-center g-3"
             style={{ marginLeft: 0, marginRight: 0 }}
           >
-            {proyectos.map((p) => {
-              let fecha = "";
-              if (p.createdAt) {
-                try {
-                  // Firestore Timestamp o Date
-                  const dateObj = p.createdAt.seconds
-                    ? new Date(p.createdAt.seconds * 1000)
-                    : new Date(p.createdAt);
-                  fecha = dateObj.toLocaleDateString("es-ES", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  });
-                } catch {
-                  fecha = "";
+            {proyectos
+              .filter(p => !usuarioSeleccionado || p.ownerId === usuarioSeleccionado)
+              .map((p) => {
+                let fecha = "";
+                if (p.createdAt) {
+                  try {
+                    const dateObj = p.createdAt.seconds
+                      ? new Date(p.createdAt.seconds * 1000)
+                      : new Date(p.createdAt);
+                    fecha = dateObj.toLocaleDateString("es-ES", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    });
+                  } catch {
+                    fecha = "";
+                  }
                 }
-              }
-              return (
-                <div key={p.id} className="col-12 d-flex justify-content-center">
-                  <div
-                    className={
-                      darkMode
-                        ? "card bg-dark text-light border-info h-100 shadow flex-fill overflow-hidden"
-                        : "card bg-white text-dark border-primary h-100 shadow-sm flex-fill overflow-hidden"
-                    }
-                    style={darkMode ? { backdropFilter: "blur(1.5px)", width: 600, maxWidth: '98vw' } : { width: 600, maxWidth: '98vw' }}
-                  >
-                    <div className="card-body d-flex flex-column h-100 w-100" style={{maxWidth: 580, margin: '0 auto'}}>
-                      <div>
-                        <h5 className="card-title fw-bold mb-2">{p.title}</h5>
-                        <p className="card-text mb-2" style={{ minHeight: 48, wordBreak: 'break-word' }}>
-                          {p.description}
-                        </p>
-                      </div>
+                const owner = usuarios.find(u => u.uid === p.ownerId);
+                return (
+                  <div key={p.id} className="col-12 d-flex justify-content-center">
+                    <Link
+                      to={`/proyecto/${p.ownerId}/${p.id}`}
+                      style={{ textDecoration: 'none', width: '100%', maxWidth: 600, display: 'block' }}
+                      className="project-link-wrapper"
+                    >
                       <div
-                        className="d-flex flex-wrap align-items-center gap-2 w-100 mt-auto justify-content-start"
-                        style={{
-                          paddingTop: 8,
-                          borderTop: "1px solid #e0e0e0",
-                          overflow: 'hidden',
-                        }}
+                        className={
+                          darkMode
+                            ? "card bg-dark text-light border-info h-100 shadow flex-fill overflow-hidden project-card-hover"
+                            : "card bg-white text-dark border-primary h-100 shadow-sm flex-fill overflow-hidden project-card-hover"
+                        }
+                        style={darkMode ? { backdropFilter: "blur(1.5px)", width: 600, maxWidth: '98vw', cursor: 'pointer' } : { width: 600, maxWidth: '98vw', cursor: 'pointer' }}
                       >
-                        <a
-                          href={p.repo}
-                          target="_blank"
-                          rel="noreferrer"
-                          className={
-                            darkMode
-                              ? "btn btn-outline-info btn-sm"
-                              : "btn btn-outline-primary btn-sm"
-                          }
-                          style={{maxWidth: '100%', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden'}}
-                        >
-                          <i className="bi bi-github"></i> Repositorio
-                        </a>
-                        <span
-                          className={
-                            p.isPublic ? "badge bg-success" : "badge bg-secondary"
-                          }
-                          style={{whiteSpace: 'nowrap'}}
-                        >
-                          {p.isPublic ? "Público" : "Privado"}
-                        </span>
-                        {fecha && (
-                          <span
-                            className="badge bg-light text-dark border border-secondary mt-1"
-                            style={{ fontSize: "0.85em", opacity: 0.85, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', cursor: 'pointer' }}
-                            title={fecha}
-                          >
-                            <i className="bi bi-calendar-event me-1"></i> {fecha}
-                          </span>
-                        )}
+                        <div className="card-body d-flex flex-column h-100 w-100" style={{maxWidth: 580, margin: '0 auto'}}>
+                          <div>
+                            <h5 className="card-title fw-bold mb-2">{p.title}</h5>
+                            <p className="card-text mb-2" style={{ minHeight: 48, wordBreak: 'break-word' }}>
+                              {p.description}
+                            </p>
+                            {/* Mostrar datos del proyecto */}
+                            <div className="mb-2">
+                              <a
+                                href={p.repo}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={darkMode ? "btn btn-outline-info btn-sm me-2" : "btn btn-outline-primary btn-sm me-2"}
+                                onClick={e => e.stopPropagation()}
+                                tabIndex={-1}
+                              >
+                                <i className="bi bi-github"></i> Repositorio
+                              </a>
+                              <span className={p.isPublic ? "badge bg-success ms-1" : "badge bg-secondary ms-1"}>
+                                {p.isPublic ? "Público" : "Privado"}
+                              </span>
+                              {(() => {
+                                let fecha = "";
+                                if (p.createdAt) {
+                                  try {
+                                    const dateObj = p.createdAt.seconds
+                                      ? new Date(p.createdAt.seconds * 1000)
+                                      : new Date(p.createdAt);
+                                    fecha = dateObj.toLocaleDateString("es-ES", {
+                                      year: "numeric",
+                                      month: "long",
+                                      day: "numeric",
+                                    });
+                                  } catch {
+                                    fecha = "";
+                                  }
+                                }
+                                return fecha ? (
+                                  <span className="badge bg-light text-dark border border-secondary ms-1" style={{ fontSize: "0.95em", opacity: 0.85 }}>
+                                    <i className="bi bi-calendar-event me-1"></i> {fecha}
+                                  </span>
+                                ) : null;
+                              })()}
+                            </div>
+                            <div className="mb-2">
+                              <b>Colaboradores:</b>{" "}
+                              {(p.collaborators && p.collaborators.length > 0) ? (
+                                p.collaborators.map((uid, idx) => {
+                                  const colab = usuarios.find(u => u.uid === uid);
+                                  return colab ? (
+                                    <span key={uid} className="badge bg-secondary text-light me-1">
+                                      <i className="bi bi-person-circle me-1"></i>{colab.displayName || colab.githubUsername || colab.email}
+                                    </span>
+                                  ) : null;
+                                })
+                              ) : (
+                                <span className="text-muted">Ninguno</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    </Link>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </section>
       </main>
+      {/* Toast de feedback */}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 };
 
 export default MisProyectos;
+
+/* Opcional: estilos para resaltar la tarjeta al pasar el mouse */
+// En tu CSS global o App.css puedes agregar:
+// .project-card-hover:hover { box-shadow: 0 0 24px #0dcaf0cc, 0 2px 8px #0002; transform: translateY(-2px) scale(1.01); z-index: 2; }

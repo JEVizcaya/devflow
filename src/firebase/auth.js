@@ -7,7 +7,11 @@ const auth = getAuth(app);
 const githubProvider = new GithubAuthProvider();
 
 // Iniciar sesión con GitHub
-export const signInWithGitHub = () => signInWithPopup(auth, githubProvider);
+export const signInWithGitHub = () => {
+  // Siempre forzar selección de cuenta
+  githubProvider.setCustomParameters({ prompt: 'select_account' });
+  return signInWithPopup(auth, githubProvider);
+};
 
 // Iniciar sesión con un token personalizado
 export const signInWithCustom = (token) => signInWithCustomToken(auth, token);

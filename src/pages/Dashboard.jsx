@@ -45,14 +45,8 @@ const Dashboard = ({ setToast }) => {
           style={{ width: '100%', maxWidth: 600, minWidth: 0, backdropFilter: darkMode ? 'blur(2px)' : undefined }}>
           {user && (
             <>
-              <img
-                src={user.photoURL}
-                alt="avatar"
-                style={{ width: 90, borderRadius: "50%", boxShadow: darkMode ? "0 0 24px #222" : "0 0 16px #bbb" }}
-                className={darkMode ? "mb-3 border border-3 border-info" : "mb-3 border border-3 border-primary"}
-              />
               <h2 className={darkMode ? "fw-bold text-info mb-2" : "fw-bold text-primary mb-2"}>
-                ¡Hola, @{user.reloadUserInfo && user.reloadUserInfo.screenName ? user.reloadUserInfo.screenName : user.email.split("@")[0]}!
+                ¡Hola, {user.reloadUserInfo && user.reloadUserInfo.screenName ? user.reloadUserInfo.screenName : user.email.split("@")[0]}!
               </h2>
               <p className={darkMode ? "lead text-light-50 mb-4" : "lead text-muted mb-4"}>
                 Bienvenido a tu espacio de trabajo colaborativo.<br />
@@ -73,8 +67,8 @@ const Dashboard = ({ setToast }) => {
               <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? { backdropFilter: 'blur(1.5px)' } : {}}>
                 <div className="card-body">
                   <i className="bi bi-folder2-open fs-1 mb-3 text-info"></i>
-                  <h5 className="card-title fw-bold">Mis proyectos</h5>
-                  <p className="card-text">Visualiza y gestiona tus proyectos de desarrollo en un solo lugar. Accede a detalles, repositorios y privacidad.</p>
+                  <h5 className="card-title fw-bold">Proyectos</h5>
+                  <p className="card-text">Visualiza y gestiona proyectos de desarrollo en un solo lugar. Accede a detalles, repositorios y privacidad.</p>
                 </div>
               </div>
             </Link>

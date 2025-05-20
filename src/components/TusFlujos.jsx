@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
 import { collection, getDocs } from "firebase/firestore";
-import db from "../firebase/firestore";
+import db, { getUserProfile } from "../firebase/firestore";
 
 const TusFlujos = () => {
   const user = getAuth().currentUser;
   const [projects, setProjects] = useState([]);
+  const [owners, setOwners] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,7 +15,15 @@ const TusFlujos = () => {
       setLoading(true);
       const colRef = collection(db, "users", user.uid, "projects");
       const snap = await getDocs(colRef);
-      setProjects(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const projectsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setProjects(projectsData);
+      // Obtener datos de los creadores (en este caso solo el usuario actual, pero preparado para más)
+      const ownerUids = Array.from(new Set(projectsData.map(p => p.ownerId || user.uid)));
+      const ownersData = {};
+      await Promise.all(ownerUids.map(async (uid) => {
+        ownersData[uid] = await getUserProfile(uid);
+      }));
+      setOwners(ownersData);
       setLoading(false);
     };
     fetchProjects();
@@ -36,9 +45,16 @@ const TusFlujos = () => {
                 <i className="bi bi-github"></i> Repositorio
               </a>
               <div>
-                <span className={proj.isPublic ? "badge bg-success" : "badge bg-secondary"}>
+                <span className={proj.isPublic ? "badge bg-success me-2" : "badge bg-secondary me-2"}>
                   {proj.isPublic ? "Público" : "Privado"}
                 </span>
+                {/* Mostrar datos del creador */}
+                {owners[proj.ownerId || user.uid] && (
+                  <span className="badge bg-info text-dark">
+                    <i className="bi bi-person-circle me-1"></i>
+                    {owners[proj.ownerId || user.uid].displayName || owners[proj.ownerId || user.uid].githubUsername || owners[proj.ownerId || user.uid].email}
+                  </span>
+                )}
               </div>
             </div>
           </div>

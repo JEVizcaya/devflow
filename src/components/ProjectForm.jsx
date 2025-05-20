@@ -22,6 +22,8 @@ const ProjectForm = ({ setToast, onProjectSaved }) => {
         repo,
         isPublic,
         ownerId: user.uid,
+        collaborators: [], // Inicializa colaboradores
+        tasks: [],         // Inicializa tareas
         createdAt: new Date(),
       };
       await addProject(user.uid, project);
