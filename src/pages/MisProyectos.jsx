@@ -89,7 +89,7 @@ const MisProyectos = () => {
       <NavBar />
       <main
         className="flex-grow-1 d-flex flex-column align-items-center justify-content-center w-100 px-0"
-        style={{ width: "100%", maxWidth: 900 }}
+        style={{ width: "100%", maxWidth: 1200 }}
       >
         <section
           className={`rounded-4 shadow-lg p-3 p-md-5 text-center mb-4 w-100 ${
@@ -99,7 +99,7 @@ const MisProyectos = () => {
           }`}
           style={{
             width: "100%",
-            maxWidth: 700,
+            maxWidth: 1000,
             minWidth: 0,
             backdropFilter: darkMode ? "blur(2px)" : undefined,
           }}
@@ -152,10 +152,10 @@ const MisProyectos = () => {
                 }
                 const owner = usuarios.find(u => u.uid === p.ownerId);
                 return (
-                  <div key={p.id} className="col-12 d-flex justify-content-center">
+                  <div key={p.id} className="col-12 d-flex justify-content-center px-1 px-sm-2" style={{maxWidth: 900, margin: '0 auto'}}>
                     <Link
                       to={`/proyecto/${p.ownerId}/${p.id}`}
-                      style={{ textDecoration: 'none', width: '100%', maxWidth: 600, display: 'block' }}
+                      style={{ textDecoration: 'none', width: '100%', maxWidth: 900, display: 'block' }}
                       className="project-link-wrapper"
                     >
                       <div
@@ -164,9 +164,17 @@ const MisProyectos = () => {
                             ? "card bg-dark text-light border-info h-100 shadow flex-fill overflow-hidden project-card-hover"
                             : "card bg-white text-dark border-primary h-100 shadow-sm flex-fill overflow-hidden project-card-hover"
                         }
-                        style={darkMode ? { backdropFilter: "blur(1.5px)", width: 600, maxWidth: '98vw', cursor: 'pointer' } : { width: 600, maxWidth: '98vw', cursor: 'pointer' }}
+                        style={{
+                          backdropFilter: darkMode ? "blur(1.5px)" : undefined,
+                          width: "100%",
+                          maxWidth: 900,
+                          minWidth: 0,
+                          cursor: "pointer",
+                          margin: 0,
+                          boxSizing: "border-box"
+                        }}
                       >
-                        <div className="card-body d-flex flex-column h-100 w-100" style={{maxWidth: 580, margin: '0 auto'}}>
+                        <div className="card-body d-flex flex-column h-100 w-100" style={{maxWidth: 880, margin: '0 auto', padding: 0}}>
                           <div>
                             <h5 className="card-title fw-bold mb-2">{p.title}</h5>
                             <p className="card-text mb-2" style={{ minHeight: 48, wordBreak: 'break-word' }}>
@@ -211,6 +219,19 @@ const MisProyectos = () => {
                               })()}
                             </div>
                             <div className="mb-2">
+                              <b>Creador:</b>{" "}
+                              {(() => {
+                                const owner = usuarios.find(u => u.uid === p.ownerId);
+                                return owner ? (
+                                  <span className="badge bg-info text-dark ms-1">
+                                    <i className="bi bi-person-badge me-1"></i>{owner.displayName || owner.githubUsername || owner.email}
+                                  </span>
+                                ) : (
+                                  <span className="text-muted">Desconocido</span>
+                                );
+                              })()}
+                            </div>
+                            <div className="mb-2">
                               <b>Colaboradores:</b>{" "}
                               {(p.collaborators && p.collaborators.length > 0) ? (
                                 p.collaborators.map((uid, idx) => {
@@ -225,6 +246,7 @@ const MisProyectos = () => {
                                 <span className="text-muted">Ninguno</span>
                               )}
                             </div>
+                            
                           </div>
                         </div>
                       </div>

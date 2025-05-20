@@ -74,13 +74,18 @@ const Dashboard = ({ setToast }) => {
             </Link>
           </div>
           <div className="col-12 col-sm-6 col-lg-4 mb-3 d-flex">
-            <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow flex-fill" : "card bg-white text-dark border-primary h-100 shadow-sm flex-fill"} style={darkMode ? { backdropFilter: 'blur(1.5px)' } : {}}>
-              <div className="card-body">
-                <i className="bi bi-people fs-1 mb-3 text-info"></i>
-                <h5 className="card-title fw-bold">Colaboración</h5>
-                <p className="card-text">Invita a tu equipo, comenta y mejora los procesos de desarrollo en tiempo real.</p>
+            <Link
+              to="/mis-tareas"
+              className="text-decoration-none flex-fill"
+            >
+              <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? { backdropFilter: 'blur(1.5px)' } : {}}>
+                <div className="card-body">
+                  <i className="bi bi-check2-square fs-1 mb-3 text-info"></i>
+                  <h5 className="card-title fw-bold">Mis tareas asignadas</h5>
+                  <p className="card-text">Accede rápidamente a todas las tareas en las que eres colaborador y gestiona su estado.</p>
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
           <div className="col-12 col-sm-6 col-lg-4 mb-3 d-flex">
             <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow flex-fill" : "card bg-white text-dark border-primary h-100 shadow-sm flex-fill"} style={darkMode ? { backdropFilter: 'blur(1.5px)' } : {}}>

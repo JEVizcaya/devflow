@@ -57,8 +57,9 @@ const ChatProyecto = ({ ownerId, projectId, collaborators, onClose, sidebar }) =
       >
         <div className="d-flex align-items-center justify-content-between p-3 border-bottom">
           <h5 className="mb-0"><i className="bi bi-chat-dots me-2"></i>Chat del proyecto</h5>
-          <button type="button" className="btn-close" onClick={onClose}></button>
+          <button type="button" className="btn-close" onClick={onClose} style={darkMode ? { filter: 'invert(1)', opacity: 0.95 } : {}}></button>
         </div>
+        {/* Fin sección tareas, solo chat a partir de aquí */}
         <div className="flex-grow-1 overflow-auto p-2" style={{height: 350}} ref={chatRef}>
           {loading ? (
             <div className="text-center py-4">Cargando mensajes...</div>

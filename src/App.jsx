@@ -10,8 +10,8 @@ import Dashboard from "./pages/Dashboard";
 import CrearProyecto from "./pages/CrearProyecto";
 import Toast from "./components/Toast";
 import MisProyectos from "./pages/MisProyectos";
-import EditarProyecto from "./pages/EditarProyecto";
 import ProyectoDetalle from "./pages/ProyectoDetalle";
+import MisTareas from "./pages/MisTareas";
 import { saveUserProfile } from "./firebase/firestore";
 
 function App() {
@@ -53,8 +53,8 @@ function App() {
           <Route path="/dashboard" element={user ? <Dashboard setToast={setToast} /> : <Navigate to="/" />} />
           <Route path="/crear-proyecto" element={user ? <CrearProyecto setToast={setToast} /> : <Navigate to="/" />} />
           <Route path="/mis-proyectos" element={<MisProyectos />} />
-          <Route path="/editar-proyecto/:ownerId/:projectId" element={<EditarProyecto />} />
           <Route path="/proyecto/:ownerId/:projectId" element={<ProyectoDetalle />} />
+          <Route path="/mis-tareas" element={<MisTareas />} />
           {/* <Route path="/proyectos-publicos" element={<ProyectosPublicos />} /> */}
         </Routes>
       </Router>
