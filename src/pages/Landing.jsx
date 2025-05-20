@@ -4,9 +4,21 @@ import { signInWithGitHub } from "../firebase/auth";
 import { useDarkMode } from "../contex/DarkModeContext";
 import NavBar from "../components/NavBar";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 const Landing = ({ setToast }) => {
   const { darkMode, setDarkMode } = useDarkMode();
+
+  // Sincroniza el modo oscuro con body y html para asegurar fondo global
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add("dark");
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.body.classList.remove("dark");
+      document.documentElement.removeAttribute("data-theme");
+    }
+  }, [darkMode]);
 
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
@@ -34,14 +46,14 @@ const Landing = ({ setToast }) => {
       className={
         "d-flex flex-column align-items-center justify-content-center px-2 w-100"
       }
-      style={darkMode ? darkBg : lightBg}
+      style={{ ...(darkMode ? darkBg : lightBg), maxWidth: 1400, margin: '0 auto' }}
     >
       <NavBar showDarkSwitchOnly />
-      <main className="flex-grow-1 d-flex flex-column align-items-center justify-content-center w-100" style={{maxWidth: 900}}>
+      <main className="flex-grow-1 d-flex flex-column align-items-center justify-content-center w-100" style={{maxWidth: 1200}}>
         <section className={
           `rounded-4 shadow-lg p-4 p-md-5 text-center mb-4 w-100 ` +
           (darkMode ? "bg-dark bg-opacity-75 border border-info text-light" : "bg-white border border-primary text-dark")
-        } style={{maxWidth: 600, backdropFilter: darkMode ? 'blur(2px)' : undefined}}>
+        } style={{maxWidth: 900, backdropFilter: darkMode ? 'blur(2px)' : undefined, margin: '0 auto'}}>
           <h1 className={darkMode ? "fw-bold text-info mb-3" : "fw-bold text-primary mb-3"}>
             Gestiona y comparte tus flujos de trabajo de desarrollo
           </h1>
@@ -53,24 +65,25 @@ const Landing = ({ setToast }) => {
             <i className="bi bi-github me-2"></i> Iniciar sesión con GitHub
           </button>
         </section>
-        <section className="row w-100 justify-content-center mt-4" style={{maxWidth: 900}}>
-          <div className="col-12 col-md-4 mb-3">
-            <Link to="/proyectos-publicos" style={{ textDecoration: 'none' }}>
-              <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)', borderColor: '#0dcaf0'} : {}}>
+        <section className="row w-100 justify-content-center mt-4" style={{maxWidth: 900, margin: '0 auto'}}>
+          <div className="col-12 mb-3 d-flex justify-content-center">
+            <Link to="/proyectos-publicos" style={{ textDecoration: 'none', width: '100%', maxWidth: 700, display: 'block' }}>
+              <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)', borderColor: '#0dcaf0', width: '100%', maxWidth: 700} : {width: '100%', maxWidth: 700}}>
                 <div className="card-body">
                   <i className={darkMode ? "bi bi-diagram-3 fs-1 mb-3 text-info" : "bi bi-diagram-3 fs-1 mb-3 text-primary"}></i>
-                  <h5 className="card-title fw-bold">Proyectos Disponibles</h5>
-                  <p className="card-text">
+                  <h5 className={darkMode ? "fw-bold mb-3 text-info" : "fw-bold mb-3 text-primary"} style={{fontSize: '2.2rem', fontWeight: 700, letterSpacing: '-1px'}}>
+                    Proyectos Disponibles
+                  </h5>
+                  <p className={darkMode ? "lead text-light-50 mb-4" : "lead text-muted mb-4"}>
                     Explora y colabora en proyectos de desarrollo de software. Con DevFlow, puedes acceder a una variedad de flujos de trabajo y contribuir a su mejora.
                   </p>
                 </div>
               </div>
             </Link>
           </div>
-          
         </section>
       </main>
-      <footer className="w-100 text-center py-3 mt-4" style={{fontSize: 14, opacity: 0.7}}>
+      <footer className={darkMode ? "w-100 text-center py-3 mt-4 text-white" : "w-100 text-center py-3 mt-4"} style={{fontSize: 14, opacity: 0.7, maxWidth: 1400, margin: '0 auto'}}>
         © {new Date().getFullYear()} DevFlow — Gestiona y comparte tus flujos de desarrollo
       </footer>
     </div>

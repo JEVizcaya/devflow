@@ -35,7 +35,7 @@ const ChatProyecto = ({ ownerId, projectId, collaborators, onClose, sidebar }) =
     await addChatMessage(ownerId, projectId, {
       text: input,
       uid: user.uid,
-      displayName: user.displayName || user.email,
+      displayName: user.reloadUserInfo?.screenName || user.displayName || user.email,
       photoURL: user.photoURL || "",
     });
     setInput("");

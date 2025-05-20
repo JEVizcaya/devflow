@@ -24,10 +24,19 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%) !important;
+}
+body.dark, body[data-theme="dark"] {
+  background: radial-gradient(ellipse at top left, #232526 60%, #23252600 100%), linear-gradient(135deg, #232526 0%, #414345 100%) !important;
+}
+
+html[data-theme="dark"] body {
+  background: radial-gradient(ellipse at top left, #232526 60%, #23252600 100%), linear-gradient(135deg, #232526 0%, #414345 100%) !important;
+}
+html:not([data-theme="dark"]) body {
+  background: linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%) !important;
 }
 
 h1 {
