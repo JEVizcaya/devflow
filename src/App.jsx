@@ -11,8 +11,8 @@ import CrearProyecto from "./pages/CrearProyecto";
 import Toast from "./components/Toast";
 import MisProyectos from "./pages/MisProyectos";
 import EditarProyecto from "./pages/EditarProyecto";
+import ProyectoDetalle from "./pages/ProyectoDetalle";
 import { saveUserProfile } from "./firebase/firestore";
-import ProyectosPublicos from "./pages/ProyectosPublicos";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -54,7 +54,8 @@ function App() {
           <Route path="/crear-proyecto" element={user ? <CrearProyecto setToast={setToast} /> : <Navigate to="/" />} />
           <Route path="/mis-proyectos" element={<MisProyectos />} />
           <Route path="/editar-proyecto/:ownerId/:projectId" element={<EditarProyecto />} />
-          <Route path="/proyectos-publicos" element={<ProyectosPublicos />} />
+          <Route path="/proyecto/:ownerId/:projectId" element={<ProyectoDetalle />} />
+          {/* <Route path="/proyectos-publicos" element={<ProyectosPublicos />} /> */}
         </Routes>
       </Router>
     </DarkModeProvider>
