@@ -132,7 +132,7 @@ const ProyectosDisponibles = () => {
                             Proyectos disponibles
                         </h2>
                     </div>
-          // ...existing code...
+          
                     <div
                         className="row w-100 justify-content-center g-3"
                         style={{ marginLeft: 0, marginRight: 0 }}
@@ -241,7 +241,7 @@ const ProyectosDisponibles = () => {
                             })
                         )}
                     </div>
-// ...existing code...
+
                 </section>
             </main>
         </div>
