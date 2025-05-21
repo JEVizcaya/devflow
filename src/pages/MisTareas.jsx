@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collectionGroup, getDocs, doc, getDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { useDarkMode } from "../contex/DarkModeContext";
 import NavBar from "../components/NavBar";
 import Toast from "../components/Toast";
@@ -21,14 +21,14 @@ const MisTareas = () => {
       setLoading(true);
       try {
         const db = getFirestore();
-        // Traer todos los proyectos de todos los usuarios
-        const projectsRef = collectionGroup(db, "projects");
+        // Traer todos los proyectos de la colección raíz 'projects'
+        const projectsRef = collection(db, "projects");
         const querySnapshot = await getDocs(projectsRef);
         let tareasAsignadas = [];
         let ownerIds = new Set();
         for (const docSnap of querySnapshot.docs) {
           const project = docSnap.data();
-          const ownerId = docSnap.ref.parent.parent.id;
+          const ownerId = project.ownerId;
           if (Array.isArray(project.tasks)) {
             project.tasks.forEach((t, idx) => {
               if (t.assignedTo === user.uid) {

@@ -79,7 +79,7 @@ const ProjectForm = ({ setToast, onProjectSaved }) => {
             className="form-control"
             value={repo}
             onChange={(e) => setRepo(e.target.value)}
-            required
+            
             placeholder="https://github.com/usuario/repositorio"
           />
         </div>

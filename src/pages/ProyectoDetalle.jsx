@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getFirestore, doc, getDoc, deleteDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useDarkMode } from "../contex/DarkModeContext";
-import { getUserProfile, addCollaboratorToProject, addTaskToProject } from "../firebase/firestore";
+import { getUserProfile, addCollaboratorToProject, addTaskToProject, getAllUsersExcept } from "../firebase/firestore";
 import NavBar from "../components/NavBar";
 import ChatProyecto from "../components/ChatProyecto";
 import Toast from "../components/Toast";
@@ -30,6 +30,7 @@ const ProyectoDetalle = () => {
   const [editTaskDesc, setEditTaskDesc] = useState("");
   const [editTaskAssignee, setEditTaskAssignee] = useState("");
   const [editTaskStatus, setEditTaskStatus] = useState("");
+  const [allUsers, setAllUsers] = useState([]);
   const navigate = useNavigate();
   const { darkMode } = useDarkMode();
   const user = getAuth().currentUser;
@@ -39,21 +40,32 @@ const ProyectoDetalle = () => {
       setLoading(true);
       try {
         const db = getFirestore();
-        const ref = doc(db, "users", ownerId, "projects", projectId);
+        // NUEVO: Leer proyecto desde la colección raíz 'projects'
+        const ref = doc(db, "projects", projectId);
         const snap = await getDoc(ref);
         if (!snap.exists()) throw new Error("Proyecto no encontrado");
         const projectData = { id: snap.id, ...snap.data() };
         setProject(projectData);
-        const ownerProfile = await getUserProfile(ownerId);
+        const ownerProfile = await getUserProfile(projectData.ownerId);
         setOwner(ownerProfile);
-        // Obtener info de colaboradores
-        if (projectData.collaborators && projectData.collaborators.length > 0) {
+        // Obtener info de colaboradores y de asignados a tareas
+        const allTaskAssignees = Array.isArray(projectData.tasks)
+          ? Array.from(new Set(projectData.tasks.map(t => t.assignedTo).filter(Boolean)))
+          : [];
+        const allColabUids = Array.isArray(projectData.collaborators) ? projectData.collaborators : [];
+        const allUids = Array.from(new Set([...allColabUids, ...allTaskAssignees]));
+        if (allUids.length > 0) {
           const infos = await Promise.all(
-            projectData.collaborators.map(uid => getUserProfile(uid))
+            allUids.map(uid => getUserProfile(uid))
           );
           setCollaboratorsInfo(infos);
         } else {
           setCollaboratorsInfo([]);
+        }
+        // Obtener todos los usuarios excepto el actual
+        if (user) {
+          const users = await getAllUsersExcept(user.uid);
+          setAllUsers(users);
         }
       } catch (e) {
         setToast({ message: "No se pudo cargar el proyecto", type: "error" });
@@ -67,8 +79,8 @@ const ProyectoDetalle = () => {
   if (loading) return <div className="container d-flex justify-content-center align-items-center min-vh-100"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Cargando...</span></div></div>;
   if (!project) return <div className="alert alert-danger text-center my-5">No se encontró el proyecto.</div>;
 
-  const isOwner = user && user.uid === ownerId;
-  const isCollaborator = user && (project.collaborators || []).includes(user.uid);
+  const isOwner = user && user.uid === project?.ownerId;
+  const isCollaborator = user && Array.isArray(project?.tasks) && project.tasks.some(t => t.assignedTo === user.uid);
 
   // Acciones
   const handleUnirse = async () => {
@@ -93,14 +105,32 @@ const ProyectoDetalle = () => {
     if (!taskTitle || !taskAssignee) return;
     setUpdatingTask(true);
     try {
-      await addTaskToProject(ownerId, projectId, {
+      // Guardar la tarea en la colección raíz 'projects'
+      const db = getFirestore();
+      const ref = doc(db, "projects", projectId);
+      const newTask = {
         title: taskTitle,
         description: taskDesc,
         assignedTo: taskAssignee,
         status: "pendiente",
         createdAt: new Date().toISOString(),
-      });
-      setProject(prev => ({ ...prev, tasks: [...(prev.tasks || []), { title: taskTitle, description: taskDesc, assignedTo: taskAssignee, status: "pendiente", createdAt: new Date().toISOString() }] }));
+      };
+      // Actualizar el array de tareas y agregar el usuario asignado a collaborators si no está
+      const prevTasks = project.tasks || [];
+      const prevCollaborators = Array.isArray(project.collaborators) ? project.collaborators : [];
+      let newCollaborators = prevCollaborators;
+      if (!prevCollaborators.includes(taskAssignee)) {
+        newCollaborators = [...prevCollaborators, taskAssignee];
+      }
+      await import("firebase/firestore").then(({ updateDoc }) => updateDoc(ref, {
+        tasks: [...prevTasks, newTask],
+        collaborators: newCollaborators
+      }));
+      setProject(prev => ({
+        ...prev,
+        tasks: [...prevTasks, newTask],
+        collaborators: newCollaborators
+      }));
       setToast({ message: "Tarea asignada", type: "success" });
       handleCloseTaskForm();
     } catch {
@@ -121,7 +151,8 @@ const ProyectoDetalle = () => {
     setUpdatingTask(true);
     try {
       const db = getFirestore();
-      const ref = doc(db, "users", ownerId, "projects", projectId);
+      // Actualizar el proyecto en la colección raíz 'projects'
+      const ref = doc(db, "projects", projectId);
       await import("firebase/firestore").then(({ updateDoc }) => updateDoc(ref, {
         title: project.title,
         description: project.description,
@@ -146,7 +177,8 @@ const ProyectoDetalle = () => {
     setShowDeleteConfirm(false);
     try {
       const db = getFirestore();
-      await deleteDoc(doc(db, "users", ownerId, "projects", projectId));
+      // Eliminar el proyecto de la colección raíz 'projects'
+      await deleteDoc(doc(db, "projects", projectId));
       setToast({ message: "Proyecto eliminado correctamente", type: "success" });
       setTimeout(() => navigate("/mis-proyectos"), 1200);
     } catch {
@@ -158,11 +190,11 @@ const ProyectoDetalle = () => {
     if (!project || !project.tasks) return;
     const updatedTasks = project.tasks.map((t, idx) => idx === taskIdx ? { ...t, status: newStatus } : t);
     setProject(prev => ({ ...prev, tasks: updatedTasks }));
-    // Actualiza en Firestore
+    // Actualiza en Firestore (colección raíz 'projects')
     try {
       const db = getFirestore();
-      const ref = doc(db, "users", ownerId, "projects", projectId);
-      await ref.update ? ref.update({ tasks: updatedTasks }) : await import("firebase/firestore").then(({ updateDoc }) => updateDoc(ref, { tasks: updatedTasks }));
+      const ref = doc(db, "projects", projectId);
+      await import("firebase/firestore").then(({ updateDoc }) => updateDoc(ref, { tasks: updatedTasks }));
       setToast({ message: "Estado de la tarea actualizado", type: "success" });
     } catch (e) {
       setToast({ message: "Error al actualizar el estado: " + (e.message || e), type: "error" });
@@ -179,8 +211,9 @@ const ProyectoDetalle = () => {
     setProject(prev => ({ ...prev, tasks: updatedTasks }));
     setDeleteTaskIdx(null);
     try {
+      // Guardar tareas editadas en la colección raíz 'projects'
       const db = getFirestore();
-      const ref = doc(db, "users", ownerId, "projects", projectId);
+      const ref = doc(db, "projects", projectId);
       await import("firebase/firestore").then(({ updateDoc }) => updateDoc(ref, { tasks: updatedTasks }));
       setToast({ message: "Tarea eliminada", type: "success" });
     } catch {
@@ -211,8 +244,9 @@ const ProyectoDetalle = () => {
       } : t);
       setProject(prev => ({ ...prev, tasks: updatedTasks }));
       setEditTaskIdx(null);
+      // Guardar tareas editadas en la colección raíz 'projects'
       const db = getFirestore();
-      const ref = doc(db, "users", ownerId, "projects", projectId);
+      const ref = doc(db, "projects", projectId);
       await import("firebase/firestore").then(({ updateDoc }) => updateDoc(ref, { tasks: updatedTasks }));
       setToast({ message: "Tarea actualizada", type: "success" });
     } catch {
@@ -376,12 +410,10 @@ const ProyectoDetalle = () => {
                     <textarea className="form-control mb-2" placeholder="Descripción" value={taskDesc} onChange={e => setTaskDesc(e.target.value)} rows={2} />
                     <select className="form-select mb-2" value={taskAssignee} onChange={e => setTaskAssignee(e.target.value)}>
                       <option value="">Asignar a...</option>
-                      {collaboratorsInfo && collaboratorsInfo.map((colab, idx) => (
-                        colab ? (
-                          <option key={colab.uid} value={colab.uid}>
-                            {colab.displayName || colab.githubUsername || colab.email}
-                          </option>
-                        ) : null
+                      {allUsers && allUsers.map((user) => (
+                        <option key={user.uid} value={user.uid}>
+                          {user.displayName || user.githubUsername || user.email}
+                        </option>
                       ))}
                     </select>
                     <div className="d-flex justify-content-end gap-2 mt-2">
@@ -445,12 +477,10 @@ const ProyectoDetalle = () => {
                       <textarea className="form-control mb-2" placeholder="Descripción" value={editTaskDesc} onChange={e => setEditTaskDesc(e.target.value)} rows={2} />
                       <select className="form-select mb-2" value={editTaskAssignee} onChange={e => setEditTaskAssignee(e.target.value)}>
                         <option value="">Asignar a...</option>
-                        {collaboratorsInfo && collaboratorsInfo.map((colab, idx) => (
-                          colab ? (
-                            <option key={colab.uid} value={colab.uid}>
-                              {colab.displayName || colab.githubUsername || colab.email}
-                            </option>
-                          ) : null
+                        {allUsers && allUsers.map((user) => (
+                          <option key={user.uid} value={user.uid}>
+                            {user.displayName || user.githubUsername || user.email}
+                          </option>
                         ))}
                       </select>
                       <select className="form-select mb-3" value={editTaskStatus} onChange={e => setEditTaskStatus(e.target.value)}>

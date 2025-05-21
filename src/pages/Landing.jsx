@@ -65,7 +65,25 @@ const Landing = ({ setToast }) => {
             <i className="bi bi-github me-2"></i> Iniciar sesión con GitHub
           </button>
         </section>
-        {/* Enlace eliminado porque ProyectosPublicos ya no existe */}
+        <section className="row w-100 justify-content-center mt-4" style={{maxWidth: 900, margin: '0 auto'}}>
+          <div className="col-12 mb-3 d-flex justify-content-center">
+            <Link to="/proyectos-publicos" style={{ textDecoration: 'none', width: '100%', maxWidth: 700, display: 'block' }}>
+              <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)', borderColor: '#0dcaf0', width: '100%', maxWidth: 700, minHeight: 0, paddingTop: 18, paddingBottom: 18} : {width: '100%', maxWidth: 700, minHeight: 0, paddingTop: 18, paddingBottom: 18}}>
+                <div className="card-body" style={{paddingTop: 18, paddingBottom: 18}}>
+                  <i className={darkMode ? "bi bi-diagram-3 fs-1 mb-2 text-info" : "bi bi-diagram-3 fs-1 mb-2 text-primary"}></i>
+                  <h5 className={darkMode ? "fw-bold mb-2 text-info" : "fw-bold mb-2 text-primary"} style={{fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-1px'}}>
+                    Proyectos públicos
+                  </h5>
+                  <p className={darkMode ? "lead text-light-50 mb-2" : "lead text-muted mb-2"} style={{fontSize: '1.05rem'}}>
+                    Explora proyectos públicos de la comunidad.
+                    <br />
+                    Contribuye y aprende de los flujos de trabajo de otros desarrolladores.
+                  </p>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </section>
       </main>
       <footer className={darkMode ? "w-100 text-center py-3 mt-4 text-white" : "w-100 text-center py-3 mt-4"} style={{fontSize: 14, opacity: 0.7, maxWidth: 1400, margin: '0 auto'}}>
         © {new Date().getFullYear()} DevFlow — Gestiona y comparte tus flujos de desarrollo

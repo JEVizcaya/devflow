@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, collectionGroup, getDocs } from "firebase/firestore";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { getUserProfile } from "../firebase/firestore";
 import NavBar from "../components/NavBar";
 import { useDarkMode } from "../contex/DarkModeContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Toast from "../components/Toast";
 
 const MisProyectos = () => {
@@ -18,6 +18,7 @@ const MisProyectos = () => {
   const user = auth.currentUser;
   const db = getFirestore();
   const { darkMode } = useDarkMode();
+  const navigate = useNavigate();
 
   // Fondos como en Dashboard
   const darkBg = {
@@ -34,14 +35,15 @@ const MisProyectos = () => {
     const fetchProyectosYUsuarios = async () => {
       setLoading(true);
       try {
-        // Traer todos los proyectos de todos los usuarios
-        const projectsRef = collectionGroup(db, "projects");
+        // Traer todos los proyectos donde ownerId es el usuario actual
+        const projectsRef = collection(db, "projects");
         const querySnapshot = await getDocs(projectsRef);
         let proyectosData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-          ownerId: doc.ref.parent.parent.id,
+          ownerId: doc.data().ownerId,
         }));
+        proyectosData = proyectosData.filter(p => p.ownerId === user.uid);
         proyectosData = proyectosData.sort((a, b) => {
           const getTime = (p) => {
             if (p.createdAt && p.createdAt.seconds) return p.createdAt.seconds * 1000;
@@ -51,9 +53,12 @@ const MisProyectos = () => {
           return getTime(b) - getTime(a);
         });
         setProyectos(proyectosData);
-        // Obtener usuarios únicos
-        const uids = Array.from(new Set(proyectosData.map(p => p.ownerId)));
-        const usuariosData = await Promise.all(uids.map(uid => getUserProfile(uid)));
+        // Obtener todos los colaboradores únicos de los proyectos
+        const colabUids = Array.from(new Set(
+          proyectosData.flatMap(p => Array.isArray(p.collaborators) ? p.collaborators : [])
+        ));
+        const allUids = Array.from(new Set([...proyectosData.map(p => p.ownerId), ...colabUids]));
+        const usuariosData = await Promise.all(allUids.map(uid => getUserProfile(uid)));
         setUsuarios(usuariosData.filter(Boolean));
       } catch (e) {
         setError("Error al cargar proyectos");
@@ -164,7 +169,7 @@ const MisProyectos = () => {
                 }
                 const owner = usuarios.find(u => u.uid === p.ownerId);
                 return (
-                  <div key={p.id} className="col-12 d-flex justify-content-center px-1 px-sm-2" style={{ maxWidth: 900, margin: '0 auto' }}>
+                  <div key={p.id} className="col-12 d-flex justify-content-center px-1 px-sm-2" style={{ maxWidth: 900, margin: '0 auto', marginBottom: 28 }}>
                     <div
                       className={
                         darkMode
@@ -181,17 +186,12 @@ const MisProyectos = () => {
                       }}
                     >
                       <div className="card-body d-flex flex-column h-100 w-100" style={{ maxWidth: 880, margin: '0 auto', padding: 0 }}>
-                        <Link
-                          to={`/proyecto/${p.ownerId}/${p.id}`}
-                          style={{ textDecoration: 'none', width: '100%', display: 'block' }}
-                          className="project-link-wrapper"
-                        >
                           <h5 className="card-title fw-bold mb-2">{p.title}</h5>
                           <p className="card-text mb-2" style={{ minHeight: 48, wordBreak: 'break-word' }}>
                             {p.description}
                           </p>
                           <div className="mb-2">
-                            <span className={p.isPublic ? "badge bg-success ms-1" : "badge bg-secondary ms-1"}>
+                            <span className={p.isPublic ? "badge bg-success ms-1" : "badge bg-danger ms-1"}>
                               {p.isPublic ? "Público" : "Privado"}
                             </span>
                             {fecha && (
@@ -225,18 +225,25 @@ const MisProyectos = () => {
                               <span className="text-muted">Ninguno</span>
                             )}
                           </div>
-                        </Link>
-                        {/* Botón de repositorio fuera del Link */}
-                        <div className="mt-2">
+                        {/* Botón de repositorio y Ver detalle alineados horizontalmente y centrados */}
+                        <div className="mt-2 d-flex flex-row align-items-center justify-content-center gap-3">
                           <a
                             href={p.repo}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={darkMode ? "btn btn-outline-info btn-sm me-2" : "btn btn-outline-primary btn-sm me-2"}
+                            className={darkMode ? "btn btn-outline-info btn-sm" : "btn btn-outline-primary btn-sm"}
                             tabIndex={-1}
+                            style={{ minWidth: 120, background: !darkMode ? '#174ea6' : undefined, color: !darkMode ? '#fff' : undefined, borderColor: !darkMode ? '#174ea6' : undefined }}
                           >
                             <i className="bi bi-github"></i> Repositorio
                           </a>
+                          <button
+                            className={darkMode ? "btn btn-outline-success btn-sm" : "btn btn-success btn-sm"}
+                            onClick={() => navigate(`/proyecto/${p.ownerId}/${p.id}`)}
+                            style={{ minWidth: 120 }}
+                          >
+                            <i className="bi bi-eye"></i> Ver detalle
+                          </button>
                         </div>
                       </div>
                     </div>

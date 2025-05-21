@@ -19,9 +19,10 @@ export const saveUserProfile = async (user) => {
 };
 
 export const addProject = async (userId, project) => {
-  // Guarda el proyecto en la colección "users/{userId}/projects"
-  return await addDoc(collection(db, "users", userId, "projects"), {
+  // Guarda el proyecto en la colección "projects" (independiente de users)
+  return await addDoc(collection(db, "projects"), {
     ...project,
+    ownerId: userId,
     collaborators: [], // Inicializa el array de colaboradores
     tasks: [],         // Inicializa el array de tareas
     createdAt: serverTimestamp(),
@@ -70,6 +71,14 @@ export const getUserProfile = async (uid) => {
   if (!uid) return null;
   const userDoc = await getDoc(doc(db, "users", uid));
   return userDoc.exists() ? userDoc.data() : null;
+};
+
+// Obtener todos los usuarios (excepto el actual)
+export const getAllUsersExcept = async (excludeUid) => {
+  const usersSnap = await getDocs(collection(db, "users"));
+  return usersSnap.docs
+    .map(doc => doc.data())
+    .filter(user => user.uid !== excludeUid);
 };
 
 export default db;

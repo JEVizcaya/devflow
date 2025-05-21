@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collectionGroup, getDocs } from "firebase/firestore";
+import { getFirestore, collection, getDocs, query, where } from "firebase/firestore";
 import { getUserProfile } from "../firebase/firestore";
 import { useDarkMode } from "../contex/DarkModeContext";
 import { Link } from "react-router-dom";
@@ -20,15 +20,17 @@ const ProyectosDisponibles = () => {
         const fetchProyectos = async () => {
             setLoading(true);
             try {
-                const projectsRef = collectionGroup(db, "projects");
-                const querySnapshot = await getDocs(projectsRef);
+                // Leer proyectos públicos de la colección raíz 'projects'
+                const projectsRef = collection(db, "projects");
+                const q = query(projectsRef, where("isPublic", "==", true));
+                const querySnapshot = await getDocs(q);
                 let proyectosData = querySnapshot.docs.map((doc) => ({
                     id: doc.id,
                     ...doc.data(),
-                    ownerId: doc.ref.parent.parent.id,
+                    ownerId: doc.data().ownerId,
                 }));
                 // Solo proyectos donde el usuario no es owner ni colaborador
-                proyectosData = proyectosData.filter((p) => p.ownerId !== user.uid && !(p.collaborators || []).includes(user.uid));
+                proyectosData = proyectosData.filter((p) => user && p.ownerId !== user.uid && !(p.collaborators || []).includes(user.uid));
                 proyectosData = proyectosData.sort((a, b) => {
                     const getTime = (p) => {
                         if (p.createdAt && p.createdAt.seconds) return p.createdAt.seconds * 1000;
@@ -132,7 +134,7 @@ const ProyectosDisponibles = () => {
                             Proyectos disponibles
                         </h2>
                     </div>
-          
+                    <div style={{ height: 24 }} />
                     <div
                         className="row w-100 justify-content-center g-3"
                         style={{ marginLeft: 0, marginRight: 0 }}
@@ -143,7 +145,6 @@ const ProyectosDisponibles = () => {
                             </div>
                         ) : (
                             proyectos.map((p) => {
-                                const owner = usuarios.find((u) => u.uid === p.ownerId);
                                 let fecha = "";
                                 if (p.createdAt) {
                                     try {
@@ -159,8 +160,9 @@ const ProyectosDisponibles = () => {
                                         fecha = "";
                                     }
                                 }
+                                const owner = usuarios.find((u) => u.uid === p.ownerId);
                                 return (
-                                    <div key={p.id} className="col-12 d-flex justify-content-center px-1 px-sm-2" style={{ maxWidth: 900, margin: '0 auto' }}>
+                                    <div key={p.id} className="col-12 d-flex justify-content-center px-1 px-sm-2" style={{ maxWidth: 900, margin: '0 auto', marginBottom: 28 }}>
                                         <div
                                             className={
                                                 darkMode
@@ -177,63 +179,65 @@ const ProyectosDisponibles = () => {
                                             }}
                                         >
                                             <div className="card-body d-flex flex-column h-100 w-100" style={{ maxWidth: 880, margin: '0 auto', padding: 0 }}>
-                                                <Link
-                                                    to={`/proyecto/${p.ownerId}/${p.id}`}
-                                                    style={{ textDecoration: 'none', width: '100%', display: 'block' }}
-                                                    className="project-link-wrapper"
-                                                >
-                                                    <h5 className="card-title fw-bold mb-2">{p.title}</h5>
-                                                    <p className="card-text mb-2" style={{ minHeight: 48, wordBreak: 'break-word' }}>
-                                                        {p.description}
-                                                    </p>
-                                                    <div className="mb-2">
-                                                        <span className={p.isPublic ? "badge bg-success ms-1" : "badge bg-secondary ms-1"}>
-                                                            {p.isPublic ? "Público" : "Privado"}
-                                                        </span>
-                                                        {fecha && (
-                                                            <span className="badge bg-light text-dark border border-secondary ms-1" style={{ fontSize: "0.95em", opacity: 0.85 }}>
-                                                                <i className="bi bi-calendar-event me-1"></i> {fecha}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <div className="mb-2">
-                                                        <b>Creador:</b>{" "}
-                                                        {owner ? (
-                                                            <span className="badge bg-info text-dark ms-1">
-                                                                <i className="bi bi-person-badge me-1"></i>{owner.displayName || owner.githubUsername || owner.email}
-                                                            </span>
-                                                        ) : (
-                                                            <span className="text-muted">Desconocido</span>
-                                                        )}
-                                                    </div>
-                                                    <div className="mb-2">
-                                                        <b>Colaboradores:</b>{" "}
-                                                        {(p.collaborators && p.collaborators.length > 0) ? (
-                                                            p.collaborators.map((uid, idx) => {
-                                                                const colab = usuarios.find(u => u.uid === uid);
-                                                                return colab ? (
-                                                                    <span key={uid} className="badge bg-secondary text-light me-1">
-                                                                        <i className="bi bi-person-circle me-1"></i>{colab.displayName || colab.githubUsername || colab.email}
-                                                                    </span>
-                                                                ) : null;
-                                                            })
-                                                        ) : (
-                                                            <span className="text-muted">Ninguno</span>
-                                                        )}
-                                                    </div>
-                                                </Link>
-                                                {/* Botón de repositorio fuera del Link */}
-                                                <div className="mt-2">
+                                                <h5 className="card-title fw-bold mb-2">{p.title}</h5>
+                                                <p className="card-text mb-2" style={{ minHeight: 48, wordBreak: 'break-word' }}>
+                                                    {p.description}
+                                                </p>
+                                                <div className="mb-2 d-flex flex-row align-items-center justify-content-center w-100" style={{ gap: 12 }}>
+                                                    <span className={p.isPublic ? "badge bg-success ms-1" : "badge bg-danger ms-1"}>
+                                                      {p.isPublic ? "Público" : "Privado"}
+                                                    </span>
+                                                    {fecha && (
+                                                      <span className="badge bg-light text-dark border border-secondary ms-1" style={{ fontSize: "0.95em", opacity: 0.85 }}>
+                                                        <i className="bi bi-calendar-event me-1"></i> {fecha}
+                                                      </span>
+                                                    )}
+                                                  </div>
+                                                  <div className="mb-2">
+                                                    <b>Creador:</b>{" "}
+                                                    {owner ? (
+                                                      <span className="badge bg-info text-dark ms-1">
+                                                        <i className="bi bi-person-badge me-1"></i>{owner.displayName || owner.githubUsername || owner.email}
+                                                      </span>
+                                                    ) : (
+                                                      <span className="text-muted">Desconocido</span>
+                                                    )}
+                                                  </div>
+                                                  <div className="mb-2">
+                                                    <b>Colaboradores:</b>{" "}
+                                                    {(p.collaborators && p.collaborators.length > 0) ? (
+                                                      p.collaborators.map((uid, idx) => {
+                                                        const colab = usuarios.find(u => u.uid === uid);
+                                                        return colab ? (
+                                                          <span key={uid} className="badge bg-secondary text-light me-1">
+                                                            <i className="bi bi-person-circle me-1"></i>{colab.displayName || colab.githubUsername || colab.email}
+                                                          </span>
+                                                        ) : null;
+                                                      })
+                                                    ) : (
+                                                      <span className="text-muted">Ninguno</span>
+                                                    )}
+                                                  </div>
+                                                  {/* Botón de repositorio y Ver detalle alineados horizontalmente y centrados */}
+                                                  <div className="mt-2 d-flex flex-row align-items-center justify-content-center gap-3">
                                                     <a
-                                                        href={p.repo}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className={darkMode ? "btn btn-outline-info btn-sm me-2" : "btn btn-outline-primary btn-sm me-2"}
-                                                        tabIndex={-1}
+                                                      href={p.repo}
+                                                      target="_blank"
+                                                      rel="noopener noreferrer"
+                                                      className={darkMode ? "btn btn-outline-info btn-sm" : "btn btn-outline-primary btn-sm"}
+                                                      tabIndex={-1}
+                                                      style={{ minWidth: 120, background: !darkMode ? '#174ea6' : undefined, color: !darkMode ? '#fff' : undefined, borderColor: !darkMode ? '#174ea6' : undefined }}
                                                     >
-                                                        <i className="bi bi-github"></i> Repositorio
+                                                      <i className="bi bi-github"></i> Repositorio
                                                     </a>
-                                                </div>
+                                                    <Link
+                                                      to={`/proyecto/${p.ownerId}/${p.id}`}
+                                                      className={darkMode ? "btn btn-outline-success btn-sm" : "btn btn-success btn-sm"}
+                                                      style={{ minWidth: 120 }}
+                                                    >
+                                                      <i className="bi bi-eye"></i> Ver detalle
+                                                    </Link>
+                                                  </div>
                                             </div>
                                         </div>
                                     </div>
