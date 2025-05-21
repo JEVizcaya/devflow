@@ -139,7 +139,7 @@ const MisProyectos = () => {
               Mis proyectos
             </h2>
           </div>
-          // ...existing code...
+          
           <div
             className="row w-100 justify-content-center g-3"
             style={{ marginLeft: 0, marginRight: 0 }}
@@ -244,7 +244,7 @@ const MisProyectos = () => {
                 );
               })}
           </div>
-// ...existing code...
+
         </section>
       </main>
       {/* Toast de feedback */}
