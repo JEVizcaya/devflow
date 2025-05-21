@@ -301,7 +301,8 @@ const ProyectoDetalle = () => {
                                 {isOwner && (
                                   <div className="d-flex justify-content-center gap-2 mt-2">
                                     <button
-                                      className="btn btn-sm btn-primary"
+                                      className="btn btn-sm btn-outline-brown"
+                                      style={{borderColor: '#a97c50', color: '#a97c50'}}
                                       onClick={() => handleOpenEditTask(idx)}
                                     >
                                       <i className="bi bi-pencil-fill"></i> Editar
@@ -334,7 +335,7 @@ const ProyectoDetalle = () => {
                   {isOwner && (
                     <>
                       <button className="btn btn-outline-success" onClick={handleOpenTaskForm}><i className="bi bi-list-task"></i> Asignar tarea</button>
-                      <button className="btn btn-outline-warning" onClick={() => setShowEditForm(true)}><i className="bi bi-pencil-square"></i> Editar proyecto</button>
+                      <button className="btn btn-outline-brown" style={{borderColor: '#a97c50', color: '#a97c50'}} onClick={() => setShowEditForm(true)}><i className="bi bi-pencil-square"></i> Editar proyecto</button>
                       <button className="btn btn-outline-danger" onClick={handleDeleteProject}><i className="bi bi-trash"></i> Eliminar proyecto</button>
                     </>
                   )}
@@ -348,10 +349,10 @@ const ProyectoDetalle = () => {
                   </button>
                   {(isOwner || isCollaborator) && (
                     <button
-                      className={darkMode ? "btn btn-outline-info" : "btn btn-outline-primary"}
+                      className={darkMode ? "btn btn-outline-light btn-chat-violeta" : "btn btn-outline btn-chat-violeta"}
                       onClick={() => setShowChat((v) => !v)}
                     >
-                      <i className="bi bi-chat-dots"></i> {showChat ? "Cerrar chat" : "Abrir chat"}
+                      <i className="bi bi-chat-dots"></i> <span className="chat-violeta-text">{showChat ? "Cerrar chat" : "Abrir chat"}</span>
                     </button>
                   )}
                   {!isOwner && !isCollaborator && (
@@ -512,6 +513,40 @@ const ProyectoDetalle = () => {
           </div>
         </div>
       )}
+      <style>
+{`
+.btn-chat-violeta {
+  border-color: #a259f7 !important;
+  color: #a259f7 !important;
+  background: transparent !important;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-chat-violeta:hover, .btn-chat-violeta:focus {
+  background: #a259f7 !important;
+  color: #fff !important;
+  border-color: #a259f7 !important;
+}
+.chat-violeta-text {
+  color: #a259f7 !important;
+}
+.btn-chat-violeta:hover .chat-violeta-text, .btn-chat-violeta:focus .chat-violeta-text {
+  color: #fff !important;
+}
+.btn-outline-brown {
+  border-color: #a97c50 !important;
+  color: #a97c50 !important;
+  background: transparent !important;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-outline-brown:hover, .btn-outline-brown:focus {
+  background: #a97c50 !important;
+  color: #fff !important;
+  border-color: #a97c50 !important;
+}
+`}
+</style>
     </div>
   );
 };

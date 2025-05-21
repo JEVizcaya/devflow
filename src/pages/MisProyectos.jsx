@@ -102,8 +102,33 @@ const MisProyectos = () => {
             maxWidth: 1000,
             minWidth: 0,
             backdropFilter: darkMode ? "blur(2px)" : undefined,
+            position: "relative" // Para posicionar la X
           }}
         >
+          {/* Botón X para cerrar */}
+          <button
+            onClick={() => window.history.back()}
+            aria-label="Cerrar"
+            style={{
+              position: "absolute",
+              top: 18,
+              right: 18,
+              zIndex: 10,
+              background: "none",
+              border: "none",
+              fontSize: 28,
+              fontWeight: 700,
+              color: darkMode ? "#fff" : "#212529",
+              opacity: 0.92,
+              cursor: "pointer",
+              transition: "color 0.2s, opacity 0.2s"
+            }}
+            onMouseOver={e => { e.currentTarget.style.opacity = 1; }}
+            onMouseOut={e => { e.currentTarget.style.opacity = 0.92; }}
+          >
+            &#10005;
+          </button>
+          {/* Fin botón X */}
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
             <h2
               className={
@@ -112,28 +137,15 @@ const MisProyectos = () => {
               }
               style={{ marginBottom: 0 }}
             >
-              Proyectos
+              Mis proyectos
             </h2>
-            <select
-              className="form-select w-auto mt-3 mt-md-0"
-              value={usuarioSeleccionado}
-              onChange={e => setUsuarioSeleccionado(e.target.value)}
-              style={{ minWidth: 180 }}
-            >
-              <option value="">Todos los usuarios</option>
-              {usuarios.map(u => (
-                <option key={u.uid} value={u.uid}>
-                  {u.displayName || u.githubUsername || u.email}
-                </option>
-              ))}
-            </select>
           </div>
           <div
             className="row w-100 justify-content-center g-3"
             style={{ marginLeft: 0, marginRight: 0 }}
           >
             {proyectos
-              .filter(p => !usuarioSeleccionado || p.ownerId === usuarioSeleccionado)
+              .filter(p => p.ownerId === user.uid)
               .map((p) => {
                 let fecha = "";
                 if (p.createdAt) {

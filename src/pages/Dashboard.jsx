@@ -67,8 +67,8 @@ const Dashboard = ({ setToast }) => {
               <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? { backdropFilter: 'blur(1.5px)' } : {}}>
                 <div className="card-body">
                   <i className="bi bi-folder2-open fs-1 mb-3 text-info"></i>
-                  <h5 className="card-title fw-bold">Proyectos</h5>
-                  <p className="card-text">Visualiza y gestiona proyectos de desarrollo en un solo lugar. Accede a detalles, repositorios y privacidad.</p>
+                  <h5 className="card-title fw-bold">Mis proyectos</h5>
+                  <p className="card-text">Visualiza y gestiona todos tus proyectos creados.</p>
                 </div>
               </div>
             </Link>
