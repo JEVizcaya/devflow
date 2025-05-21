@@ -92,11 +92,10 @@ const MisProyectos = () => {
         style={{ width: "100%", maxWidth: 1200 }}
       >
         <section
-          className={`rounded-4 shadow-lg p-3 p-md-5 text-center mb-4 w-100 ${
-            darkMode
+          className={`rounded-4 shadow-lg p-3 p-md-5 text-center mb-4 w-100 ${darkMode
               ? "bg-dark bg-opacity-75 border border-info text-light"
               : "bg-white border border-primary text-dark"
-          }`}
+            }`}
           style={{
             width: "100%",
             maxWidth: 1000,
@@ -140,6 +139,7 @@ const MisProyectos = () => {
               Mis proyectos
             </h2>
           </div>
+          // ...existing code...
           <div
             className="row w-100 justify-content-center g-3"
             style={{ marginLeft: 0, marginRight: 0 }}
@@ -164,109 +164,87 @@ const MisProyectos = () => {
                 }
                 const owner = usuarios.find(u => u.uid === p.ownerId);
                 return (
-                  <div key={p.id} className="col-12 d-flex justify-content-center px-1 px-sm-2" style={{maxWidth: 900, margin: '0 auto'}}>
-                    <Link
-                      to={`/proyecto/${p.ownerId}/${p.id}`}
-                      style={{ textDecoration: 'none', width: '100%', maxWidth: 900, display: 'block' }}
-                      className="project-link-wrapper"
+                  <div key={p.id} className="col-12 d-flex justify-content-center px-1 px-sm-2" style={{ maxWidth: 900, margin: '0 auto' }}>
+                    <div
+                      className={
+                        darkMode
+                          ? "card bg-dark text-light border-info h-100 shadow flex-fill overflow-hidden project-card-hover"
+                          : "card bg-white text-dark border-primary h-100 shadow-sm flex-fill overflow-hidden project-card-hover"
+                      }
+                      style={{
+                        backdropFilter: darkMode ? "blur(1.5px)" : undefined,
+                        width: "100%",
+                        maxWidth: 900,
+                        minWidth: 0,
+                        margin: 0,
+                        boxSizing: "border-box"
+                      }}
                     >
-                      <div
-                        className={
-                          darkMode
-                            ? "card bg-dark text-light border-info h-100 shadow flex-fill overflow-hidden project-card-hover"
-                            : "card bg-white text-dark border-primary h-100 shadow-sm flex-fill overflow-hidden project-card-hover"
-                        }
-                        style={{
-                          backdropFilter: darkMode ? "blur(1.5px)" : undefined,
-                          width: "100%",
-                          maxWidth: 900,
-                          minWidth: 0,
-                          cursor: "pointer",
-                          margin: 0,
-                          boxSizing: "border-box"
-                        }}
-                      >
-                        <div className="card-body d-flex flex-column h-100 w-100" style={{maxWidth: 880, margin: '0 auto', padding: 0}}>
-                          <div>
-                            <h5 className="card-title fw-bold mb-2">{p.title}</h5>
-                            <p className="card-text mb-2" style={{ minHeight: 48, wordBreak: 'break-word' }}>
-                              {p.description}
-                            </p>
-                            {/* Mostrar datos del proyecto */}
-                            <div className="mb-2">
-                              <a
-                                href={p.repo}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={darkMode ? "btn btn-outline-info btn-sm me-2" : "btn btn-outline-primary btn-sm me-2"}
-                                onClick={e => e.stopPropagation()}
-                                tabIndex={-1}
-                              >
-                                <i className="bi bi-github"></i> Repositorio
-                              </a>
-                              <span className={p.isPublic ? "badge bg-success ms-1" : "badge bg-secondary ms-1"}>
-                                {p.isPublic ? "Público" : "Privado"}
+                      <div className="card-body d-flex flex-column h-100 w-100" style={{ maxWidth: 880, margin: '0 auto', padding: 0 }}>
+                        <Link
+                          to={`/proyecto/${p.ownerId}/${p.id}`}
+                          style={{ textDecoration: 'none', width: '100%', display: 'block' }}
+                          className="project-link-wrapper"
+                        >
+                          <h5 className="card-title fw-bold mb-2">{p.title}</h5>
+                          <p className="card-text mb-2" style={{ minHeight: 48, wordBreak: 'break-word' }}>
+                            {p.description}
+                          </p>
+                          <div className="mb-2">
+                            <span className={p.isPublic ? "badge bg-success ms-1" : "badge bg-secondary ms-1"}>
+                              {p.isPublic ? "Público" : "Privado"}
+                            </span>
+                            {fecha && (
+                              <span className="badge bg-light text-dark border border-secondary ms-1" style={{ fontSize: "0.95em", opacity: 0.85 }}>
+                                <i className="bi bi-calendar-event me-1"></i> {fecha}
                               </span>
-                              {(() => {
-                                let fecha = "";
-                                if (p.createdAt) {
-                                  try {
-                                    const dateObj = p.createdAt.seconds
-                                      ? new Date(p.createdAt.seconds * 1000)
-                                      : new Date(p.createdAt);
-                                    fecha = dateObj.toLocaleDateString("es-ES", {
-                                      year: "numeric",
-                                      month: "long",
-                                      day: "numeric",
-                                    });
-                                  } catch {
-                                    fecha = "";
-                                  }
-                                }
-                                return fecha ? (
-                                  <span className="badge bg-light text-dark border border-secondary ms-1" style={{ fontSize: "0.95em", opacity: 0.85 }}>
-                                    <i className="bi bi-calendar-event me-1"></i> {fecha}
+                            )}
+                          </div>
+                          <div className="mb-2">
+                            <b>Creador:</b>{" "}
+                            {owner ? (
+                              <span className="badge bg-info text-dark ms-1">
+                                <i className="bi bi-person-badge me-1"></i>{owner.displayName || owner.githubUsername || owner.email}
+                              </span>
+                            ) : (
+                              <span className="text-muted">Desconocido</span>
+                            )}
+                          </div>
+                          <div className="mb-2">
+                            <b>Colaboradores:</b>{" "}
+                            {(p.collaborators && p.collaborators.length > 0) ? (
+                              p.collaborators.map((uid, idx) => {
+                                const colab = usuarios.find(u => u.uid === uid);
+                                return colab ? (
+                                  <span key={uid} className="badge bg-secondary text-light me-1">
+                                    <i className="bi bi-person-circle me-1"></i>{colab.displayName || colab.githubUsername || colab.email}
                                   </span>
                                 ) : null;
-                              })()}
-                            </div>
-                            <div className="mb-2">
-                              <b>Creador:</b>{" "}
-                              {(() => {
-                                const owner = usuarios.find(u => u.uid === p.ownerId);
-                                return owner ? (
-                                  <span className="badge bg-info text-dark ms-1">
-                                    <i className="bi bi-person-badge me-1"></i>{owner.displayName || owner.githubUsername || owner.email}
-                                  </span>
-                                ) : (
-                                  <span className="text-muted">Desconocido</span>
-                                );
-                              })()}
-                            </div>
-                            <div className="mb-2">
-                              <b>Colaboradores:</b>{" "}
-                              {(p.collaborators && p.collaborators.length > 0) ? (
-                                p.collaborators.map((uid, idx) => {
-                                  const colab = usuarios.find(u => u.uid === uid);
-                                  return colab ? (
-                                    <span key={uid} className="badge bg-secondary text-light me-1">
-                                      <i className="bi bi-person-circle me-1"></i>{colab.displayName || colab.githubUsername || colab.email}
-                                    </span>
-                                  ) : null;
-                                })
-                              ) : (
-                                <span className="text-muted">Ninguno</span>
-                              )}
-                            </div>
-                            
+                              })
+                            ) : (
+                              <span className="text-muted">Ninguno</span>
+                            )}
                           </div>
+                        </Link>
+                        {/* Botón de repositorio fuera del Link */}
+                        <div className="mt-2">
+                          <a
+                            href={p.repo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={darkMode ? "btn btn-outline-info btn-sm me-2" : "btn btn-outline-primary btn-sm me-2"}
+                            tabIndex={-1}
+                          >
+                            <i className="bi bi-github"></i> Repositorio
+                          </a>
                         </div>
                       </div>
-                    </Link>
+                    </div>
                   </div>
                 );
               })}
           </div>
+// ...existing code...
         </section>
       </main>
       {/* Toast de feedback */}
