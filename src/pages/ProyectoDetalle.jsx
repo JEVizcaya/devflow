@@ -321,7 +321,7 @@ const ProyectoDetalle = () => {
                         })}
                       </div>
                     ) : (
-                      <div className="text-muted">No hay tareas asignadas.</div>
+                      <div className={darkMode ? "text-white" : "text-muted"}>No hay tareas asignadas.</div>
                     )}
                   </div>
                 )}
