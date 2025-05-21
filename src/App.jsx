@@ -12,6 +12,7 @@ import Toast from "./components/Toast";
 import MisProyectos from "./pages/MisProyectos";
 import ProyectoDetalle from "./pages/ProyectoDetalle";
 import MisTareas from "./pages/MisTareas";
+import ProyectosDisponibles from "./pages/ProyectosDisponibles";
 import { saveUserProfile } from "./firebase/firestore";
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
           <Route path="/mis-proyectos" element={<MisProyectos />} />
           <Route path="/proyecto/:ownerId/:projectId" element={<ProyectoDetalle />} />
           <Route path="/mis-tareas" element={<MisTareas />} />
+          <Route path="/proyectos-disponibles" element={<ProyectosDisponibles />} />
           {/* <Route path="/proyectos-publicos" element={<ProyectosPublicos />} /> */}
         </Routes>
       </Router>

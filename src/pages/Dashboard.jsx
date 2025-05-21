@@ -6,7 +6,7 @@ import { useDarkMode } from "../contex/DarkModeContext";
 import logo from "../assets/landing-illustration.svg";
 import NavBar from "../components/NavBar";
 
-const Dashboard = ({ setToast }) => {
+const Dashboard = ({ setToast, proyectos }) => {
   const user = getAuth().currentUser;
   const navigate = useNavigate();
   const { darkMode, setDarkMode } = useDarkMode();
@@ -88,13 +88,18 @@ const Dashboard = ({ setToast }) => {
             </Link>
           </div>
           <div className="col-12 col-sm-6 col-lg-4 mb-3 d-flex">
-            <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow flex-fill" : "card bg-white text-dark border-primary h-100 shadow-sm flex-fill"} style={darkMode ? { backdropFilter: 'blur(1.5px)' } : {}}>
-              <div className="card-body">
-                <i className="bi bi-github fs-1 mb-3 text-info"></i>
-                <h5 className="card-title fw-bold">Integración GitHub</h5>
-                <p className="card-text">Conecta tus flujos con tus repositorios y automatiza tareas desde GitHub.</p>
+            <Link
+              to="/proyectos-disponibles"
+              className="text-decoration-none flex-fill"
+            >
+              <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? { backdropFilter: 'blur(1.5px)' } : {}}>
+                <div className="card-body">
+                  <i className="bi bi-people fs-1 mb-3 text-info"></i>
+                  <h5 className="card-title fw-bold">Proyectos disponibles</h5>
+                  <p className="card-text">Explora y colabora en los proyectos de otros usuarios.</p>
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
         </section>
       </main>
