@@ -51,13 +51,13 @@ const Landing = ({ setToast }) => {
       <NavBar showDarkSwitchOnly />
       <main className="flex-grow-1 d-flex flex-column align-items-center justify-content-center w-100" style={{maxWidth: 1200}}>
         <section className={
-          `rounded-4 shadow-lg p-4 p-md-5 text-center mb-4 w-100 ` +
+          `rounded-4 shadow-lg p-3 p-md-4 text-center mb-4 w-100 ` +
           (darkMode ? "bg-dark bg-opacity-75 border border-info text-light" : "bg-white border border-primary text-dark")
-        } style={{maxWidth: 900, backdropFilter: darkMode ? 'blur(2px)' : undefined, margin: '0 auto'}}>
-          <h1 className={darkMode ? "fw-bold text-info mb-3" : "fw-bold text-primary mb-3"}>
+        } style={{maxWidth: 700, backdropFilter: darkMode ? 'blur(2px)' : undefined, margin: '0 auto', paddingTop: 18, paddingBottom: 18}}>
+          <h1 className={darkMode ? "fw-bold text-info mb-2" : "fw-bold text-primary mb-2"} style={{fontSize: '1.6rem'}}>
             Gestiona y comparte tus flujos de trabajo de desarrollo
           </h1>
-          <p className={darkMode ? "lead text-light-50 mb-4" : "lead text-muted mb-4"}>
+          <p className={darkMode ? "lead text-light-50 mb-3" : "lead text-muted mb-3"} style={{fontSize: '1.05rem'}}>
             DevFlow es la plataforma donde equipos y desarrolladores pueden documentar, visualizar y compartir procesos de desarrollo de software de forma colaborativa y eficiente.<br />
             <span className="fw-semibold">Accede con tu cuenta de <span className={darkMode ? "text-info" : "text-primary"}>GitHub</span> para empezar.</span>
           </p>
@@ -68,13 +68,13 @@ const Landing = ({ setToast }) => {
         <section className="row w-100 justify-content-center mt-4" style={{maxWidth: 900, margin: '0 auto'}}>
           <div className="col-12 mb-3 d-flex justify-content-center">
             <Link to="/proyectos-publicos" style={{ textDecoration: 'none', width: '100%', maxWidth: 700, display: 'block' }}>
-              <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)', borderColor: '#0dcaf0', width: '100%', maxWidth: 700} : {width: '100%', maxWidth: 700}}>
-                <div className="card-body">
-                  <i className={darkMode ? "bi bi-diagram-3 fs-1 mb-3 text-info" : "bi bi-diagram-3 fs-1 mb-3 text-primary"}></i>
-                  <h5 className={darkMode ? "fw-bold mb-3 text-info" : "fw-bold mb-3 text-primary"} style={{fontSize: '2.2rem', fontWeight: 700, letterSpacing: '-1px'}}>
+              <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? {backdropFilter: 'blur(1.5px)', borderColor: '#0dcaf0', width: '100%', maxWidth: 700, minHeight: 0, paddingTop: 18, paddingBottom: 18} : {width: '100%', maxWidth: 700, minHeight: 0, paddingTop: 18, paddingBottom: 18}}>
+                <div className="card-body" style={{paddingTop: 18, paddingBottom: 18}}>
+                  <i className={darkMode ? "bi bi-diagram-3 fs-1 mb-2 text-info" : "bi bi-diagram-3 fs-1 mb-2 text-primary"}></i>
+                  <h5 className={darkMode ? "fw-bold mb-2 text-info" : "fw-bold mb-2 text-primary"} style={{fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-1px'}}>
                     Proyectos Disponibles
                   </h5>
-                  <p className={darkMode ? "lead text-light-50 mb-4" : "lead text-muted mb-4"}>
+                  <p className={darkMode ? "lead text-light-50 mb-2" : "lead text-muted mb-2"} style={{fontSize: '1.05rem'}}>
                     Explora y colabora en proyectos de desarrollo de software. Con DevFlow, puedes acceder a una variedad de flujos de trabajo y contribuir a su mejora.
                   </p>
                 </div>

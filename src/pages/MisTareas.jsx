@@ -64,8 +64,8 @@ const MisTareas = () => {
   return (
     <div className="d-flex flex-column align-items-center justify-content-center px-2 w-100" style={darkMode ? {background: "radial-gradient(ellipse at top left, #232526 60%, #23252600 100%), linear-gradient(135deg, #232526 0%, #414345 100%)", minHeight: "100vh"} : {background: "linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%)", minHeight: "100vh"}}>
       <NavBar />
-      <main className="flex-grow-1 d-flex flex-column align-items-center justify-content-center w-100 px-0" style={{ width: '100%', maxWidth: 900 }}>
-        <section className={`rounded-4 shadow-lg p-3 p-md-5 text-center mb-4 w-100 ${darkMode ? "bg-dark bg-opacity-75 border border-info text-light" : "bg-white border border-primary text-dark"}`} style={{ width: '100%', maxWidth: 600, minWidth: 0, backdropFilter: darkMode ? 'blur(2px)' : undefined, position: 'relative' }}>
+      <main className="flex-grow-1 d-flex flex-column align-items-center justify-content-center w-100 px-0" style={{ width: '100%', maxWidth: 1100 }}>
+        <section className={`rounded-4 shadow-lg p-3 p-md-5 text-center mb-4 w-100 ${darkMode ? "bg-dark bg-opacity-75 border border-info text-light" : "bg-white border border-primary text-dark"}`} style={{ width: '100%', maxWidth: 900, minWidth: 0, backdropFilter: darkMode ? 'blur(2px)' : undefined, position: 'relative' }}>
           <button
             type="button"
             className="btn-close position-absolute"
@@ -91,7 +91,7 @@ const MisTareas = () => {
                   className="text-decoration-none"
                   style={{ cursor: 'pointer' }}
                 >
-                  <div className={darkMode ? "card bg-secondary bg-opacity-25 border-info text-light mb-2" : "card bg-light border-primary text-dark mb-2"}>
+                  <div className={darkMode ? "card bg-secondary bg-opacity-25 border-info text-light mb-2" : "card bg-light border-primary text-dark mb-2"} style={{maxWidth: 880, margin: '0 auto'}}>
                     <div className="card-body py-2 px-3">
                       <div className="d-flex justify-content-between align-items-center mb-1">
                         <span className="fw-bold">{t.title}</span>
