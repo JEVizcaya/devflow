@@ -125,8 +125,8 @@ const ProyectosDisponibles = () => {
                         <h2
                             className={
                                 darkMode
-                                    ? "fw-bold mb-0 text-info w-100 text-center text-md-start"
-                                    : "fw-bold mb-0 text-primary w-100 text-center text-md-start"
+                                    ? "fw-bold mb-0 text-info w-100 text-center"
+                                    : "fw-bold mb-0 text-primary w-100 text-center"
                             }
                         >
                             Proyectos disponibles

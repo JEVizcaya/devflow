@@ -132,7 +132,7 @@ const MisProyectos = () => {
             <h2
               className={
                 (darkMode ? "fw-bold mb-0 text-info" : "fw-bold mb-0 text-primary") +
-                " w-100 text-center text-md-start"
+                " w-100 text-center"
               }
               style={{ marginBottom: 0 }}
             >
