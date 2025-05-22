@@ -459,7 +459,7 @@ const ProyectoDetalle = () => {
                     <textarea className="form-control mb-2" placeholder="Descripción" value={taskDesc} onChange={e => setTaskDesc(e.target.value)} rows={2} />
                     <select className="form-select mb-2" value={taskAssignee} onChange={e => setTaskAssignee(e.target.value)}>
                       <option value="">Asignar a...</option>
-                      {allUsers && allUsers.map((user) => (
+                      {collaboratorsInfo && collaboratorsInfo.map((user) => (
                         <option key={user.uid} value={user.uid}>
                           {user.displayName || user.githubUsername || user.email}
                         </option>
@@ -526,7 +526,7 @@ const ProyectoDetalle = () => {
                       <textarea className="form-control mb-2" placeholder="Descripción" value={editTaskDesc} onChange={e => setEditTaskDesc(e.target.value)} rows={2} />
                       <select className="form-select mb-2" value={editTaskAssignee} onChange={e => setEditTaskAssignee(e.target.value)}>
                         <option value="">Asignar a...</option>
-                        {allUsers && allUsers.map((user) => (
+                        {collaboratorsInfo && collaboratorsInfo.map((user) => (
                           <option key={user.uid} value={user.uid}>
                             {user.displayName || user.githubUsername || user.email}
                           </option>
