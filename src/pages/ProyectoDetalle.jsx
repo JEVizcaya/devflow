@@ -417,6 +417,18 @@ const ProyectoDetalle = () => {
                       </div>
                     </>
                   )}
+                  {/* Botón para unirse como colaborador si NO es owner NI colaborador */}
+                  {!isOwner && !isCollaborator && (
+                    <div className="w-100 d-flex justify-content-center align-items-center" style={{margin: '0 auto'}}>
+                      <button
+                        className={darkMode ? "btn btn-success" : "btn btn-success"}
+                        style={{fontWeight: 600, fontSize: 16, borderRadius: 6, minHeight: 44, maxWidth: 320, width: '100%', maxWidth: 350}}
+                        onClick={handleUnirse}
+                      >
+                        <i className="bi bi-person-plus me-2"></i> Unirse como colaborador
+                      </button>
+                    </div>
+                  )}
                   {/* Botón chat fuera del menú, separado horizontalmente en escritorio */}
                   {(isOwner || isCollaborator) && (
                     <div style={{minWidth: 170, maxWidth: 220, display: 'flex', alignItems: 'center'}} className="order-3 mb-2 mb-lg-0 ms-lg-auto">
