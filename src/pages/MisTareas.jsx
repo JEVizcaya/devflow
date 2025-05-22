@@ -27,25 +27,15 @@ const MisTareas = () => {
         let tareasAsignadas = [];
         let proyectosColaborador = [];
         let ownerIds = new Set();
+        let proyectosConTarea = new Set();
         for (const docSnap of querySnapshot.docs) {
           const project = docSnap.data();
           const ownerId = project.ownerId;
-          // Si el usuario es colaborador (pero no owner)
-          if (Array.isArray(project.collaborators) && project.collaborators.includes(user.uid) && ownerId !== user.uid) {
-            proyectosColaborador.push({
-              projectId: docSnap.id,
-              ownerId,
-              projectTitle: project.title,
-              projectDescription: project.description,
-              projectStatus: project.status || '',
-              // Puedes agregar más campos si lo deseas
-            });
-            ownerIds.add(ownerId);
-          }
+          let tieneTareaAsignada = false;
           // Tareas asignadas
           if (Array.isArray(project.tasks)) {
             project.tasks.forEach((t, idx) => {
-              if (t.assignedTo === user.uid) {
+              if (t.assignedTo === user.uid && t.status !== 'finalizada') {
                 tareasAsignadas.push({
                   ...t,
                   projectId: docSnap.id,
@@ -54,8 +44,25 @@ const MisTareas = () => {
                   idx
                 });
                 ownerIds.add(ownerId);
+                proyectosConTarea.add(docSnap.id);
+                tieneTareaAsignada = true;
               }
             });
+          }
+          // Si el usuario es colaborador (pero no owner), mostrar siempre el proyecto (tenga o no tareas asignadas)
+          if (
+            Array.isArray(project.collaborators) &&
+            project.collaborators.includes(user.uid) &&
+            ownerId !== user.uid
+          ) {
+            proyectosColaborador.push({
+              projectId: docSnap.id,
+              ownerId,
+              projectTitle: project.title,
+              projectDescription: project.description,
+              projectStatus: project.status || '',
+            });
+            ownerIds.add(ownerId);
           }
         }
         // Obtener info de creadores
@@ -88,6 +95,7 @@ const MisTareas = () => {
             onClick={() => navigate(-1)}
             style={{ top: 16, right: 16, zIndex: 10, ...(darkMode ? { filter: 'invert(1)', opacity: 0.95 } : {}) }}
           ></button>
+          {/* Mis tareas asignadas */}
           <h2 className={darkMode ? "fw-bold text-info mb-2" : "fw-bold text-primary mb-2"}>Mis tareas asignadas</h2>
           <div style={{height: 32}} />
           {loading ? (
@@ -100,7 +108,9 @@ const MisTareas = () => {
             <div className="alert alert-info">No participas en ningún proyecto como colaborador.</div>
           ) : (
             <>
-              {tareas.length > 0 && (
+              {tareas.length === 0 ? (
+                <div className="alert alert-info">No tienes tareas asignadas.</div>
+              ) : (
                 <div className="d-flex flex-column gap-3 mt-3">
                   {tareas.map((t, i) => (
                     <Link
@@ -131,9 +141,11 @@ const MisTareas = () => {
                 </div>
               )}
               {/* Proyectos donde soy colaborador pero no tengo tareas asignadas */}
-              {proyectosColaborador.length > 0 && (
+              <h2 className={darkMode ? "fw-bold text-info mb-2" : "fw-bold text-primary mb-2"}>Proyectos en los que participo como colaborador</h2>
+              {proyectosColaborador.length === 0 ? (
+                <div className="alert alert-info">No colaboras en ningún proyecto.</div>
+              ) : (
                 <div className="d-flex flex-column gap-3 mt-4">
-                  <h2 className={darkMode ? "text-info" : "text-primary"}>Proyectos en los que participo como colaborador</h2>
                   {proyectosColaborador.map((p, i) => (
                     <Link
                       key={p.projectId}

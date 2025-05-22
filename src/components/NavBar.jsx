@@ -84,9 +84,26 @@ const NavBar = ({ onLogout, showDarkSwitchOnly }) => {
                     <span className="devflow-slider"></span>
                   </label>
                 </div>
-                <button className={darkMode ? "btn btn-info btn-sm w-100 mb-1" : "btn btn-primary btn-sm w-100 mb-1"} onClick={e => { e.stopPropagation(); onLogout && onLogout(); setShowMenu(false); }}>
-                  <i className="bi bi-box-arrow-right me-1"></i> Cerrar sesión
-                </button>
+                {/* Responsive: Home button instead of logout, excepto en dashboard */}
+                {location.pathname !== "/dashboard" && (
+                  <Link
+                    to="/dashboard"
+                    className={darkMode ? "btn btn-outline-info btn-sm w-100 mb-1 d-md-none" : "btn btn-outline-primary btn-sm w-100 mb-1 d-md-none"}
+                    style={{ fontWeight: 500, transition: 'background 0.18s, color 0.18s' }}
+                    onClick={e => { e.stopPropagation(); setShowMenu(false); }}
+                  >
+                    <i className="bi bi-house me-1"></i> Home
+                  </Link>
+                )}
+                {/* Responsive: Logout button solo en dashboard */}
+                {location.pathname === "/dashboard" && (
+                  <button
+                    className={darkMode ? "btn btn-info btn-sm w-100 mb-1 d-md-none" : "btn btn-primary btn-sm w-100 mb-1 d-md-none"}
+                    onClick={e => { e.stopPropagation(); onLogout && onLogout(); setShowMenu(false); }}
+                  >
+                    <i className="bi bi-box-arrow-right me-1"></i> Cerrar sesión
+                  </button>
+                )}
               </div>
             </div>
             {/* Desktop: controles normales */}
