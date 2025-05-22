@@ -80,13 +80,21 @@ const ProyectoDetalle = () => {
   if (!project) return <div className="alert alert-danger text-center my-5">No se encontró el proyecto.</div>;
 
   const isOwner = user && user.uid === project?.ownerId;
-  const isCollaborator = user && Array.isArray(project?.tasks) && project.tasks.some(t => t.assignedTo === user.uid);
+  const isCollaborator = user && Array.isArray(project?.collaborators) && project.collaborators.includes(user.uid);
 
   // Acciones
   const handleUnirse = async () => {
     try {
-      await addCollaboratorToProject(ownerId, projectId, user.uid);
-      setProject(prev => ({ ...prev, collaborators: [...(prev.collaborators || []), user.uid] }));
+      // Actualizar en la colección raíz 'projects', no en users/ownerId/projects
+      const db = getFirestore();
+      const ref = doc(db, "projects", projectId);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) throw new Error("Proyecto no encontrado");
+      const data = snap.data();
+      if (data.collaborators && data.collaborators.includes(user.uid)) return;
+      const newCollaborators = [...(data.collaborators || []), user.uid];
+      await import("firebase/firestore").then(({ updateDoc }) => updateDoc(ref, { collaborators: newCollaborators }));
+      setProject(prev => ({ ...prev, collaborators: newCollaborators }));
       setToast({ message: "Te has unido como colaborador", type: "success" });
     } catch {
       setToast({ message: "Error al unirse como colaborador", type: "error" });
@@ -263,12 +271,14 @@ const ProyectoDetalle = () => {
         <section className="row w-100 justify-content-center g-3" style={{maxWidth: 1100}}>
           <div className="col-12 col-lg-8 mb-3">
             <div className={darkMode ? "card bg-dark text-light border-info shadow-lg" : "card bg-white text-dark border-primary shadow-lg"}>
-              <div className="card-body">
-                <div className="d-flex justify-content-start mb-3">
-                  <button className={darkMode ? "btn btn-outline-light" : "btn btn-outline-secondary"} onClick={() => navigate(-1)}>
-                    <i className="bi bi-arrow-left"></i> Volver
-                  </button>
-                </div>
+              <div className="card-body position-relative">
+                <button
+                  type="button"
+                  className="btn-close position-absolute"
+                  aria-label="Cerrar"
+                  onClick={() => navigate(-1)}
+                  style={{ top: 12, right: 16, zIndex: 10, filter: darkMode ? 'invert(1)' : 'none', opacity: 0.95 }}
+                ></button>
                 <h2 className="fw-bold mb-3">{project.title}</h2>
                 <p className="mb-3" style={{fontSize: 18}}>{project.description}</p>
                 {/* Sección de tareas asignadas: ahora en un div externo, no colapsable ni modal */}
@@ -289,7 +299,7 @@ const ProyectoDetalle = () => {
                         {project.tasks.map((task, idx) => {
                           const assignedColab = collaboratorsInfo.find(c => c && c.uid === task.assignedTo);
                           return (
-                            <div key={idx} className={darkMode ? "card bg-secondary bg-opacity-25 border-info text-light" : "card bg-light border-primary text-dark"} style={{marginBottom: 4}}>
+                            <div key={idx} className={darkMode ? "card bg-secondary bg-opacity-25 border-info text-light" : "card bg-light border-primary text-dark"} style={{marginBottom: 4, position: 'relative'}}>
                               <div className="card-body py-2 px-3">
                                 <div className="d-flex justify-content-between align-items-center mb-1">
                                   <span className="fw-bold">{task.title}</span>
@@ -317,7 +327,8 @@ const ProyectoDetalle = () => {
                                     )
                                   }
                                 </div>
-                                {user && user.uid === task.assignedTo && (
+                                {typeof user?.uid === 'string' && typeof task?.assignedTo === 'string' &&
+                                  user.uid.trim().toLowerCase() === task.assignedTo.trim().toLowerCase() && (
                                   <div className="mb-2">
                                     <label className="me-2">Cambiar estado:</label>
                                     <select
@@ -325,6 +336,7 @@ const ProyectoDetalle = () => {
                                       value={task.status}
                                       onChange={e => handleTaskStatusChange(idx, e.target.value)}
                                       style={{maxWidth: 180, display: 'inline-block'}}
+                                      disabled={task.status === 'finalizada'}
                                     >
                                       <option value="pendiente">Pendiente</option>
                                       <option value="en proceso">En proceso</option>
@@ -332,21 +344,14 @@ const ProyectoDetalle = () => {
                                     </select>
                                   </div>
                                 )}
+                                {/* Menú de acciones solo para el owner */}
                                 {isOwner && (
-                                  <div className="d-flex justify-content-center gap-2 mt-2">
-                                    <button
-                                      className="btn btn-sm btn-outline-brown"
-                                      style={{borderColor: '#a97c50', color: '#a97c50'}}
-                                      onClick={() => handleOpenEditTask(idx)}
-                                    >
-                                      <i className="bi bi-pencil-fill"></i> Editar
-                                    </button>
-                                    <button
-                                      className="btn btn-sm btn-outline-danger"
-                                      onClick={() => handleDeleteTask(idx)}
-                                    >
-                                      <i className="bi bi-trash-fill"></i> Eliminar
-                                    </button>
+                                  <div style={{position: 'absolute', top: 10, right: 12, zIndex: 2}} className="task-action-dropdown">
+                                    <ActionMenu
+                                      onEdit={() => handleOpenEditTask(idx)}
+                                      onDelete={() => handleDeleteTask(idx)}
+                                      darkMode={darkMode}
+                                    />
                                   </div>
                                 )}
                               </div>
@@ -362,35 +367,56 @@ const ProyectoDetalle = () => {
                 {/* Fin sección tareas asignadas */}
                 {/* Eliminar datos de repo, público/privado, fecha y colaboradores de los detalles */}
                 {/* Acciones según rol */}
-                <div className="d-flex flex-wrap gap-2 mt-4">
-                  {isCollaborator && !isOwner && (
-                    <button className="btn btn-outline-info" onClick={handleUnirse} disabled><i className="bi bi-person-check"></i> Ya eres colaborador</button>
-                  )}
+                <div className="d-flex flex-wrap gap-2 mt-4 position-relative align-items-stretch" style={{minHeight: 48}}>
+                  {/* Menú de acciones para el owner */}
                   {isOwner && (
-                    <>
-                      <button className="btn btn-outline-success" onClick={handleOpenTaskForm}><i className="bi bi-list-task"></i> Asignar tarea</button>
-                      <button className="btn btn-outline-brown" style={{borderColor: '#a97c50', color: '#a97c50'}} onClick={() => setShowEditForm(true)}><i className="bi bi-pencil-square"></i> Editar proyecto</button>
-                      <button className="btn btn-outline-danger" onClick={handleDeleteProject}><i className="bi bi-trash"></i> Eliminar proyecto</button>
-                    </>
+                    <div style={{position: 'relative', zIndex: 2, minWidth: 170, maxWidth: 220, display: 'flex', alignItems: 'center'}} className="project-action-dropdown order-1 mb-2 mb-lg-0">
+                      <ActionMenuProject
+                        onAssignTask={handleOpenTaskForm}
+                        onEditProject={() => setShowEditForm(true)}
+                        onDeleteProject={handleDeleteProject}
+                        onShowTasks={() => setShowTasks(v => !v)}
+                        showTasks={showTasks}
+                        darkMode={darkMode}
+                      />
+                    </div>
                   )}
-                  {/* Botón Tareas asignadas solo una vez, nunca duplicado */}
-                  <button
-                    className={darkMode ? "btn btn-outline-info" : "btn btn-outline-primary"}
-                    onClick={() => setShowTasks(v => !v)}
-                  >
-                    <i className={showTasks ? "bi bi-x-lg me-2" : "bi bi-list-task me-2"}></i>
-                    {showTasks ? "Ocultar tareas asignadas" : "Tareas asignadas"}
-                  </button>
-                  {(isOwner || isCollaborator) && (
-                    <button
-                      className={darkMode ? "btn btn-outline-light btn-chat-violeta" : "btn btn-outline btn-chat-violeta"}
-                      onClick={() => setShowChat((v) => !v)}
-                    >
-                      <i className="bi bi-chat-dots"></i> <span className="chat-violeta-text">{showChat ? "Cerrar chat" : "Abrir chat"}</span>
-                    </button>
-                  )}
+                  {/* Si no es owner ni colaborador, botón unirse */}
                   {!isOwner && !isCollaborator && (
-                    <button className="btn btn-outline-info" onClick={handleUnirse}><i className="bi bi-person-plus"></i> Unirse como colaborador</button>
+                    <div style={{flex: '1 1 170px', minWidth: 170, maxWidth: 220, display: 'flex', alignItems: 'center'}} className="order-3 mb-2 mb-lg-0">
+                      <button className="btn btn-outline-info w-100" onClick={handleUnirse}><i className="bi bi-person-plus"></i> Unirse como colaborador</button>
+                    </div>
+                  )}
+                  {/* Si es colaborador pero no owner, botón ya eres colaborador */}
+                  {isCollaborator && !isOwner && (
+                    <div style={{flex: '1 1 170px', minWidth: 170, maxWidth: 220, display: 'flex', alignItems: 'center'}} className="order-1 mb-2 mb-lg-0">
+                      <button className="btn btn-outline-info w-100" onClick={handleUnirse} disabled><i className="bi bi-person-check"></i> Ya eres colaborador</button>
+                    </div>
+                  )}
+                  {/* Botón para mostrar tareas asignadas solo para colaboradores (no owner) */}
+                  {isCollaborator && !isOwner && (
+                    <div style={{flex: '1 1 170px', minWidth: 170, maxWidth: 220, display: 'flex', alignItems: 'center'}} className="order-2 mb-2 mb-lg-0">
+                      <button
+                        className={darkMode ? "btn btn-outline-light w-100" : "btn btn-outline-primary w-100"}
+                        onClick={() => setShowTasks(v => !v)}
+                        style={{fontWeight: 600, letterSpacing: 0.5, fontSize: 15, borderRadius: 6, minHeight: 40}}
+                      >
+                        <i className={showTasks ? "bi bi-x-lg me-2" : "bi bi-list-task me-2"}></i>
+                        {showTasks ? "Ocultar tareas asignadas" : "Tareas asignadas"}
+                      </button>
+                    </div>
+                  )}
+                  {/* Botón chat fuera del menú, separado horizontalmente en escritorio */}
+                  {(isOwner || isCollaborator) && (
+                    <div style={{minWidth: 170, maxWidth: 220, display: 'flex', alignItems: 'center'}} className="order-3 mb-2 mb-lg-0 ms-lg-auto">
+                      <button
+                        className={darkMode ? "btn btn-outline-light btn-chat-violeta d-flex align-items-center w-100" : "btn btn-outline btn-chat-violeta d-flex align-items-center w-100"}
+                        style={{fontWeight: 600, letterSpacing: 0.5, fontSize: 15, borderRadius: 6, minHeight: 40, boxShadow: darkMode ? '0 2px 8px #0004' : '0 2px 8px #0002'}}
+                        onClick={() => setShowChat((v) => !v)}
+                      >
+                        <i className="bi bi-chat-dots me-2"></i> <span className="chat-violeta-text">{showChat ? "Cerrar chat" : "Abrir chat"}</span>
+                      </button>
+                    </div>
                   )}
                 </div>
                 {/* Formulario para asignar tarea: ahora en un div externo, no modal */}
@@ -446,7 +472,7 @@ const ProyectoDetalle = () => {
                       </div>
                       <div className="mb-3 text-start">
                         <label className="form-label">Enlace al repositorio</label>
-                        <input type="url" className="form-control" name="repo" value={project.repo || ""} onChange={e => setProject({ ...project, repo: e.target.value })} required />
+                        <input type="url" className="form-control" name="repo" value={project.repo || ""} onChange={e => setProject({ ...project, repo: e.target.value })} />
                       </div>
                       <div className="form-check form-switch mb-4 text-start">
                         <input className="form-check-input" type="checkbox" id="publicSwitch" checked={!!project.isPublic} onChange={e => setProject({ ...project, isPublic: e.target.checked })} />
@@ -546,39 +572,162 @@ const ProyectoDetalle = () => {
       <style>
 {`
 .btn-chat-violeta {
-  border-color: #a259f7 !important;
-  color: #a259f7 !important;
+  border-color: #fd7e14 !important;
+  color: #fd7e14 !important;
   background: transparent !important;
   font-weight: 600;
   transition: background 0.15s, color 0.15s;
 }
 .btn-chat-violeta:hover, .btn-chat-violeta:focus {
-  background: #a259f7 !important;
+  background: #fd7e14 !important;
   color: #fff !important;
-  border-color: #a259f7 !important;
-}
-.chat-violeta-text {
-  color: #a259f7 !important;
+  border-color: #fd7e14 !important;
 }
 .btn-chat-violeta:hover .chat-violeta-text, .btn-chat-violeta:focus .chat-violeta-text {
   color: #fff !important;
 }
-.btn-outline-brown {
-  border-color: #a97c50 !important;
-  color: #a97c50 !important;
-  background: transparent !important;
-  font-weight: 600;
-  transition: background 0.15s, color 0.15s;
+.btn-chat-violeta .action-violeta-icon {
+  color: #fd7e14 !important;
+  transition: color 0.15s;
 }
-.btn-outline-brown:hover, .btn-outline-brown:focus {
-  background: #a97c50 !important;
+.btn-chat-violeta:hover .action-violeta-icon, .btn-chat-violeta:focus .action-violeta-icon {
   color: #fff !important;
-  border-color: #a97c50 !important;
+}
+.btn-outline-light.btn-chat-violeta, .btn-outline-light.btn-chat-violeta .chat-violeta-text, .btn-outline-light.btn-chat-violeta .action-violeta-icon {
+  color: #fff !important;
+  border-color: #fd7e14 !important;
+}
+.btn-outline-light.btn-chat-violeta:hover, .btn-outline-light.btn-chat_violeta:focus {
+  background: #fd7e14 !important;
+  color: #fff !important;
+  border-color: #fd7e14 !important;
+}
+.btn-outline-light.btn-chat-violeta:hover .chat-violeta-text, .btn-outline-light.btn-chat_violeta:focus .chat-violeta-text,
+.btn-outline-light.btn-chat-violeta:hover .action-violeta-icon, .btn-outline-light.btn-chat_violeta:focus .action-violeta-icon {
+  color: #fff !important;
+}
+.action-menu-btn {
+  transition: background 0.15s, color 0.15s;
+  color: #6c757d !important;
+  border-color: #6c757d !important;
+  background: transparent !important;
+}
+.action-menu-btn:hover, .action-menu-btn:focus {
+  background: #6c757d !important;
+  color: #fff !important;
+  border-color: #6c757d !important;
 }
 `}
 </style>
     </div>
   );
 };
+
+function ActionMenu({ onEdit, onDelete, darkMode }) {
+  const [open, setOpen] = React.useState(false);
+  React.useEffect(() => {
+    if (!open) return;
+    const close = e => {
+      if (!e.target.closest('.action-menu-root')) setOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [open]);
+  return (
+    <div className="action-menu-root" style={{display: 'inline-block', position: 'relative'}}>
+      <button
+        className={darkMode ? "btn btn-sm btn-outline-light px-2 py-0" : "btn btn-sm btn-outline-secondary px-2 py-0"}
+        style={{border: 'none', background: 'none'}}
+        onClick={e => { e.stopPropagation(); setOpen(v => !v); }}
+        aria-label="Acciones"
+        tabIndex={0}
+      >
+        <i className="bi bi-three-dots-vertical fs-5"></i>
+      </button>
+      {open && (
+        <div
+          className={darkMode ? "dropdown-menu show p-0 border-0 shadow bg-dark text-light" : "dropdown-menu show p-0 border-0 shadow bg-white text-dark"}
+          style={{position: 'absolute', right: 0, top: 32, minWidth: 120, zIndex: 10, borderRadius: 8, overflow: 'hidden'}}
+        >
+          <button
+            className="dropdown-item d-flex align-items-center gap-2"
+            style={{fontWeight: 500, color: darkMode ? '#a97c50' : '#a97c50'}}
+            onClick={() => { setOpen(false); onEdit(); }}
+          >
+            <i className="bi bi-pencil-fill"></i> Editar
+          </button>
+          <button
+            className="dropdown-item d-flex align-items-center gap-2"
+            style={{fontWeight: 500, color: '#dc3545'}}
+            onClick={() => { setOpen(false); onDelete(); }}
+          >
+            <i className="bi bi-trash-fill"></i> Eliminar
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Nuevo componente ActionMenuProject (al final del archivo, antes del export default)
+function ActionMenuProject({ onAssignTask, onEditProject, onDeleteProject, onShowTasks, showTasks, darkMode }) {
+  const [open, setOpen] = React.useState(false);
+  React.useEffect(() => {
+    if (!open) return;
+    const close = e => {
+      if (!e.target.closest('.action-menu-project-root')) setOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [open]);
+  return (
+    <div className="action-menu-project-root" style={{display: 'inline-block', position: 'relative'}}>
+      <button
+        className={darkMode ? "btn btn-outline-light d-flex align-items-center action-menu-btn" : "btn btn-outline-secondary d-flex align-items-center action-menu-btn"}
+        style={{fontWeight: 600, letterSpacing: 0.5, fontSize: 15, borderRadius: 6, minHeight: 40, minWidth: 170, boxShadow: darkMode ? '0 2px 8px #0004' : '0 2px 8px #0002', color: '#6c757d', borderColor: '#6c757d'}}
+        onClick={e => { e.stopPropagation(); setOpen(v => !v); }}
+        aria-label="Acciones del proyecto"
+        tabIndex={0}
+      >
+        <i className="bi bi-sliders me-2"></i> <span>Acciones</span> <i className="bi bi-caret-down-fill ms-1"></i>
+      </button>
+      {open && (
+        <div
+          className={darkMode ? "dropdown-menu show p-0 border-0 shadow bg-dark text-light" : "dropdown-menu show p-0 border-0 shadow bg-white text-dark"}
+          style={{position: 'absolute', right: 0, top: 42, minWidth: 180, zIndex: 10, borderRadius: 8, overflow: 'hidden'}}
+        >
+          <button
+            className="dropdown-item d-flex align-items-center gap-2"
+            style={{fontWeight: 500, color: '#198754'}} // verde
+            onClick={() => { setOpen(false); onAssignTask(); }}
+          >
+            <i className="bi bi-list-task"></i> Asignar tarea
+          </button>
+          <button
+            className="dropdown-item d-flex align-items-center gap-2"
+            style={{fontWeight: 500, color: '#0d6efd'}}
+            onClick={() => { setOpen(false); onEditProject(); }}
+          >
+            <i className="bi bi-pencil-square"></i> Editar proyecto
+          </button>
+          <button
+            className="dropdown-item d-flex align-items-center gap-2"
+            style={{fontWeight: 500, color: '#dc3545'}}
+            onClick={() => { setOpen(false); onDeleteProject(); }}
+          >
+            <i className="bi bi-trash"></i> Eliminar proyecto
+          </button>
+          <button
+            className="dropdown-item d-flex align-items-center gap-2"
+            style={{fontWeight: 500, color: '#ffc107'}} // amarillo
+            onClick={() => { setOpen(false); onShowTasks(); }}
+          >
+            <i className={showTasks ? "bi bi-x-lg" : "bi bi-list-task"}></i> {showTasks ? "Ocultar tareas asignadas" : "Tareas asignadas"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default ProyectoDetalle;

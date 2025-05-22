@@ -98,38 +98,20 @@ const ProyectosDisponibles = () => {
                     }}
                 >
                     <button
-                        onClick={() => window.history.back()}
+                        type="button"
+                        className="btn-close position-absolute"
                         aria-label="Cerrar"
-                        style={{
-                            position: "absolute",
-                            top: 18,
-                            right: 18,
-                            zIndex: 10,
-                            background: "none",
-                            border: "none",
-                            fontSize: 28,
-                            fontWeight: 700,
-                            color: darkMode ? "#fff" : "#212529",
-                            opacity: 0.92,
-                            cursor: "pointer",
-                            transition: "color 0.2s, opacity 0.2s",
-                        }}
-                        onMouseOver={(e) => {
-                            e.currentTarget.style.opacity = 1;
-                        }}
-                        onMouseOut={(e) => {
-                            e.currentTarget.style.opacity = 0.92;
-                        }}
-                    >
-                        &#10005;
-                    </button>
-                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+                        onClick={() => window.history.back()}
+                        style={{ top: 16, right: 16, zIndex: 10, ...(darkMode ? { filter: 'invert(1)', opacity: 0.95 } : {}) }}
+                    ></button>
+                    <div className="d-flex flex-row justify-content-between align-items-center mb-4" style={{position: 'relative'}}>
                         <h2
                             className={
                                 darkMode
                                     ? "fw-bold mb-0 text-info w-100 text-center"
                                     : "fw-bold mb-0 text-primary w-100 text-center"
                             }
+                            style={{flex: 1, marginBottom: 0}}
                         >
                             Proyectos disponibles
                         </h2>

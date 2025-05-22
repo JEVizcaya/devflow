@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { addProject } from "../firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { useDarkMode } from "../contex/DarkModeContext";
 
 const ProjectForm = ({ setToast, onProjectSaved }) => {
+  const { darkMode } = useDarkMode();
   const user = getAuth().currentUser;
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
@@ -43,12 +45,12 @@ const ProjectForm = ({ setToast, onProjectSaved }) => {
 
   return (
     <form
-      className="my-5 w-100"
+      className={darkMode ? "my-5 w-100 bg-dark text-light border-info rounded-3 shadow-lg" : "my-5 w-100 bg-white text-dark border-primary rounded-3 shadow-lg"}
       onSubmit={handleSubmit}
-      style={{ padding: "0 1rem" }}
+      style={{ padding: "2rem 1rem", maxWidth: 520, margin: "0 auto", border: '2px solid', borderColor: darkMode ? '#0dcaf0' : '#0d6efd' }}
     >
       <div className="w-100" style={{ width: "100%" }}>
-        <h4 className="mb-4">Nuevo Proyecto</h4>
+        <h4 className={darkMode ? "mb-4 text-info" : "mb-4 text-primary"}>Nuevo Proyecto</h4>
 
         <div className="mb-3">
           <label className="form-label">Título</label>

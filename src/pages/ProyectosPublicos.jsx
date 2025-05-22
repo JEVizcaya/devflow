@@ -86,24 +86,26 @@ const ProyectosPublicos = () => {
                     <button
                         onClick={() => window.history.back()}
                         aria-label="Cerrar"
+                        className="btn-close position-absolute d-block"
                         style={{
-                            position: "absolute",
                             top: 18,
                             right: 18,
                             zIndex: 10,
-                            background: "none",
-                            border: "none",
                             fontSize: 28,
                             fontWeight: 700,
                             color: darkMode ? "#fff" : "#212529",
                             opacity: 0.92,
                             cursor: "pointer",
-                            transition: "color 0.2s, opacity 0.2s"
+                            transition: "color 0.2s, opacity 0.2s",
+                            background: "none",
+                            border: "none",
+                            lineHeight: 1,
+                            padding: 0,
                         }}
                         onMouseOver={e => { e.currentTarget.style.opacity = 1; }}
                         onMouseOut={e => { e.currentTarget.style.opacity = 0.92; }}
                     >
-                        &#10005;
+                        <span aria-hidden="true">&#10005;</span>
                     </button>
                     {/* Fin botón X */}
                     <h2 className={darkMode ? "fw-bold mb-0 text-info w-100 text-center" : "fw-bold mb-0 text-primary w-100 text-center"}>Proyectos públicos</h2>

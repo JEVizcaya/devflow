@@ -74,6 +74,7 @@ const MisTareas = () => {
             style={{ top: 16, right: 16, zIndex: 10, ...(darkMode ? { filter: 'invert(1)', opacity: 0.95 } : {}) }}
           ></button>
           <h2 className={darkMode ? "fw-bold text-info mb-2" : "fw-bold text-primary mb-2"}>Mis tareas asignadas</h2>
+          <div style={{height: 32}} />
           {loading ? (
             <div className="d-flex justify-content-center align-items-center my-5">
               <div className="spinner-border text-info" role="status">
