@@ -96,7 +96,7 @@ const MisTareas = () => {
             style={{ top: 16, right: 16, zIndex: 10, ...(darkMode ? { filter: 'invert(1)', opacity: 0.95 } : {}) }}
           ></button>
           {/* Mis tareas asignadas */}
-          <h2 className={darkMode ? "fw-bold text-info mb-2" : "fw-bold text-primary mb-2"}>Mis tareas asignadas</h2>
+          <h2 className={darkMode ? "fw-bold text-info mb-2 text-center" : "fw-bold text-primary mb-2 text-center"}>Mis tareas asignadas</h2>
           <div style={{height: 32}} />
           {loading ? (
             <div className="d-flex justify-content-center align-items-center my-5">
@@ -120,19 +120,21 @@ const MisTareas = () => {
                       style={{ cursor: 'pointer' }}
                     >
                       <div className={darkMode ? "card bg-secondary bg-opacity-25 border-info text-light mb-2" : "card bg-light border-primary text-dark mb-2"} style={{maxWidth: 880, margin: '0 auto'}}>
-                        <div className="card-body py-2 px-3">
-                          <div className="d-flex justify-content-between align-items-center mb-1">
-                            <span className="fw-bold">{t.title}</span>
-                            <span className={t.status === 'pendiente' ? "badge bg-warning text-dark" : t.status === 'en proceso' ? "badge bg-primary" : "badge bg-success"}>{t.status}</span>
+                        <div className="card-body py-3 px-4">
+                          <div className="d-flex flex-column align-items-center mb-2">
+                            <span className="fw-bold w-100 text-center d-block mb-2" style={{fontSize: 18}}>{t.title}</span>
                           </div>
-                          <div style={{fontSize: 14}} className="mb-1">{t.description}</div>
-                          <div style={{fontSize: 13}} className={darkMode ? "mb-2" : "text-muted mb-2"}>
+                          <div style={{fontSize: 15}} className="mb-3 text-center">{t.description}</div>
+                          <div style={{fontSize: 13}} className={darkMode ? "mb-3" : "text-muted mb-3"}>
                             <i className="bi bi-kanban me-1"></i>
                             Proyecto: <span className="fw-semibold">{t.projectTitle}</span>
                           </div>
-                          <div style={{fontSize: 13}} className={darkMode ? "mb-2" : "text-muted mb-2"}>
+                          <div style={{fontSize: 13}} className={darkMode ? "mb-3" : "text-muted mb-3"}>
                             <i className="bi bi-person-circle me-1"></i>
                             Tarea asignada por: <span className="fw-semibold">{creadores[t.ownerId]?.displayName || creadores[t.ownerId]?.githubUsername || creadores[t.ownerId]?.email || 'Desconocido'}</span>
+                          </div>
+                          <div className="w-100 d-flex justify-content-center mt-2">
+                            <span className={t.status === 'pendiente' ? "badge bg-warning text-dark" : t.status === 'en proceso' ? "badge bg-primary" : "badge bg-success"} style={{fontSize: 13}}>{t.status}</span>
                           </div>
                         </div>
                       </div>
@@ -141,7 +143,7 @@ const MisTareas = () => {
                 </div>
               )}
               {/* Proyectos donde soy colaborador pero no tengo tareas asignadas */}
-              <h2 className={darkMode ? "fw-bold text-info mb-2" : "fw-bold text-primary mb-2"}>Proyectos en los que participo como colaborador</h2>
+              <h2 className={darkMode ? "fw-bold text-info mb-2 text-center" : "fw-bold text-primary mb-2 text-center"}>Proyectos en los que participo como colaborador</h2>
               {proyectosColaborador.length === 0 ? (
                 <div className="alert alert-info">No colaboras en ningún proyecto.</div>
               ) : (
@@ -154,13 +156,13 @@ const MisTareas = () => {
                       style={{ cursor: 'pointer' }}
                     >
                       <div className={darkMode ? "card bg-secondary bg-opacity-25 border-info text-light mb-2" : "card bg-light border-primary text-dark mb-2"} style={{maxWidth: 880, margin: '0 auto'}}>
-                        <div className="card-body py-2 px-3">
-                          <div className="d-flex justify-content-between align-items-center mb-1">
-                            <span className="fw-bold">{p.projectTitle}</span>
+                        <div className="card-body py-3 px-4">
+                          <div className="d-flex flex-column align-items-center mb-2">
+                            <span className="fw-bold w-100 text-center d-block mb-2" style={{fontSize: 18}}>{p.projectTitle}</span>
                             {/* Puedes mostrar el estado del proyecto si lo tienes */}
                           </div>
-                          <div style={{fontSize: 14}} className="mb-1">{p.projectDescription}</div>
-                          <div style={{fontSize: 13}} className={darkMode ? "mb-2" : "text-muted mb-2"}>
+                          <div style={{fontSize: 15}} className="mb-3 text-center">{p.projectDescription}</div>
+                          <div style={{fontSize: 13}} className={darkMode ? "mb-1" : "text-muted mb-1"}>
                             <i className="bi bi-person-circle me-1"></i>
                             Creador: <span className="fw-semibold">{creadores[p.ownerId]?.displayName || creadores[p.ownerId]?.githubUsername || creadores[p.ownerId]?.email || 'Desconocido'}</span>
                           </div>
