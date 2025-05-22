@@ -69,7 +69,7 @@ function App() {
           <Route path="/proyecto/:ownerId/:projectId" element={<ProtectedRoute user={user} element={<ProyectoDetalle />} setToast={setToast} />} />
           <Route path="/mis-tareas" element={<ProtectedRoute user={user} element={<MisTareas />} setToast={setToast} />} />
           <Route path="/proyectos-disponibles" element={<ProtectedRoute user={user} element={<ProyectosDisponibles />} setToast={setToast} />} />
-          <Route path="/proyectos-publicos" element={<ProtectedRoute user={user} element={<ProyectosPublicos />} setToast={setToast} />} />
+          <Route path="/proyectos-publicos" element={<ProyectosPublicos />} />
         </Routes>
       </Router>
     </DarkModeProvider>
