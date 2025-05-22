@@ -211,7 +211,7 @@ const MisProyectos = () => {
                             <b>Creador:</b>{" "}
                             {owner ? (
                               <span className="badge bg-info text-dark ms-1">
-                                <i className="bi bi-person-badge me-1"></i>{owner.displayName || owner.githubUsername || owner.email}
+                                <i className="bi bi-person-badge me-1"></i>{owner.githubUsername || owner.displayName || owner.email}
                               </span>
                             ) : (
                               <span className="text-muted">Desconocido</span>
@@ -224,7 +224,7 @@ const MisProyectos = () => {
                                 const colab = usuarios.find(u => u.uid === uid);
                                 return colab ? (
                                   <span key={uid} className="badge bg-secondary text-light me-1">
-                                    <i className="bi bi-person-circle me-1"></i>{colab.displayName || colab.githubUsername || colab.email}
+                                    <i className="bi bi-person-circle me-1"></i>{colab.githubUsername || colab.displayName || colab.email}
                                   </span>
                                 ) : null;
                               })
