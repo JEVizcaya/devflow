@@ -3,11 +3,12 @@ import logo from "../assets/landing-illustration.svg";
 import { signInWithGitHub } from "../firebase/auth";
 import { useDarkMode } from "../contex/DarkModeContext";
 import NavBar from "../components/NavBar";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from 'react-router-dom'; // Import useLocation
 import { useEffect } from "react";
 
 const Landing = ({ setToast }) => {
   const { darkMode, setDarkMode } = useDarkMode();
+  const location = useLocation(); // Get location object
 
   // Sincroniza el modo oscuro con body y html para asegurar fondo global
   useEffect(() => {
@@ -19,6 +20,21 @@ const Landing = ({ setToast }) => {
       document.documentElement.removeAttribute("data-theme");
     }
   }, [darkMode]);
+
+  // Check for authRequired query parameter and show toast
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    if (queryParams.get('authRequired') === 'true') {
+      setToast && setToast({ 
+        message: "Debes estar logueado para acceder a esta página.", 
+        type: "error"
+        // If you want the centered/large toast, you'd add isCenteredAndLarge: true here,
+        // assuming you re-apply that change to Toast.jsx as well.
+      });
+      // Optionally, remove the query parameter from the URL to prevent re-showing on refresh
+      // window.history.replaceState({}, document.title, location.pathname);
+    }
+  }, [location, setToast]);
 
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
 

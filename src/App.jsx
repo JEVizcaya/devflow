@@ -16,6 +16,17 @@ import ProyectosDisponibles from "./pages/ProyectosDisponibles";
 import ProyectosPublicos from "./pages/ProyectosPublicos";
 import { saveUserProfile } from "./firebase/firestore";
 
+// Define ProtectedRoute component
+const ProtectedRoute = ({ user, element, setToast }) => {
+  if (user) {
+    return element;
+  } else {
+    // Redirect to landing page with a query parameter to indicate authentication is required.
+    // Also pass setToast to Landing page if needed for the message.
+    return <Navigate to="/?authRequired=true" replace />;
+  }
+};
+
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,7 +54,7 @@ function App() {
     await auth.signOut();
     setUser(null);
     setToast && setToast({ message: "Sesión cerrada", type: "success" });
-    navigate("/");
+    // navigate("/"); // As noted before, navigate is not defined here.
   };
 
   return (
@@ -52,13 +63,13 @@ function App() {
         {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         <Routes>
           <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Landing setToast={setToast} />} />
-          <Route path="/dashboard" element={user ? <Dashboard setToast={setToast} /> : <Navigate to="/" />} />
-          <Route path="/crear-proyecto" element={user ? <CrearProyecto setToast={setToast} /> : <Navigate to="/" />} />
-          <Route path="/mis-proyectos" element={<MisProyectos />} />
-          <Route path="/proyecto/:ownerId/:projectId" element={<ProyectoDetalle />} />
-          <Route path="/mis-tareas" element={<MisTareas />} />
-          <Route path="/proyectos-disponibles" element={<ProyectosDisponibles />} />
-          <Route path="/proyectos-publicos" element={<ProyectosPublicos />} />
+          <Route path="/dashboard" element={<ProtectedRoute user={user} element={<Dashboard setToast={setToast} />} setToast={setToast} />} />
+          <Route path="/crear-proyecto" element={<ProtectedRoute user={user} element={<CrearProyecto setToast={setToast} />} setToast={setToast} />} />
+          <Route path="/mis-proyectos" element={<ProtectedRoute user={user} element={<MisProyectos />} setToast={setToast} />} />
+          <Route path="/proyecto/:ownerId/:projectId" element={<ProtectedRoute user={user} element={<ProyectoDetalle />} setToast={setToast} />} />
+          <Route path="/mis-tareas" element={<ProtectedRoute user={user} element={<MisTareas />} setToast={setToast} />} />
+          <Route path="/proyectos-disponibles" element={<ProtectedRoute user={user} element={<ProyectosDisponibles />} setToast={setToast} />} />
+          <Route path="/proyectos-publicos" element={<ProtectedRoute user={user} element={<ProyectosPublicos />} setToast={setToast} />} />
         </Routes>
       </Router>
     </DarkModeProvider>
