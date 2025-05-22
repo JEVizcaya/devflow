@@ -272,14 +272,16 @@ const ProyectoDetalle = () => {
           <div className="col-12 col-lg-8 mb-3">
             <div className={darkMode ? "card bg-dark text-light border-info shadow-lg" : "card bg-white text-dark border-primary shadow-lg"}>
               <div className="card-body position-relative">
-                <button
-                  type="button"
-                  className="btn-close position-absolute"
-                  aria-label="Cerrar"
-                  onClick={() => navigate(-1)}
-                  style={{ top: 12, right: 16, zIndex: 10, filter: darkMode ? 'invert(1)' : 'none', opacity: 0.95 }}
-                ></button>
-                <h2 className="fw-bold mb-3">{project.title}</h2>
+                <div className={`d-flex align-items-center mb-3 proyecto-titulo-cerrar-responsive`} style={{position: 'relative', minHeight: 48}}>
+                  <h2 className="fw-bold mb-0 flex-grow-1" style={{wordBreak: 'break-word'}}>{project.title}</h2>
+                  <button
+                    type="button"
+                    className="btn-close position-absolute close-btn-responsive"
+                    aria-label="Cerrar"
+                    onClick={() => navigate(-1)}
+                    style={{ top: 12, right: 16, zIndex: 10, filter: darkMode ? 'invert(1)' : 'none', opacity: 0.95 }}
+                  ></button>
+                </div>
                 <p className="mb-3" style={{fontSize: 18}}>{project.description}</p>
                 {/* Sección de tareas asignadas: ahora en un div externo, no colapsable ni modal */}
                 {showTasks && (
@@ -641,6 +643,33 @@ const ProyectoDetalle = () => {
   border-color: #6c757d !important;
 }
 @media (max-width: 768px) {
+  .project-header-responsive {
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 0.2rem !important;
+    margin-bottom: 1.2rem !important;
+    position: relative;
+  }
+  .project-header-responsive .close-btn-responsive {
+    align-self: flex-end !important;
+    position: static !important;
+    margin-bottom: 0.2rem !important;
+    top: unset !important;
+    right: unset !important;
+  }
+  .project-header-responsive .project-title-responsive {
+    width: 100% !important;
+    text-align: center !important;
+    margin-bottom: 0 !important;
+    font-size: 1.35rem !important;
+    word-break: break-word !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  .close-btn-responsive {
+    top: 8px !important;
+    right: 8px !important;
+  }
   .tareas-asignadas-responsive {
     padding: 1.2rem 0.5rem !important;
     margin-left: -8px !important;
@@ -715,6 +744,34 @@ const ProyectoDetalle = () => {
     border-radius: 6px !important;
     padding: 12px 16px !important;
     box-sizing: border-box !important; /* Asegura que padding y border se incluyan en width/height */
+  }
+
+  .proyecto-titulo-cerrar-responsive {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0 !important;
+    min-height: unset !important;
+    padding-right: 0 !important;
+    margin-bottom: 1.2rem !important;
+  }
+  .proyecto-titulo-cerrar-responsive .close-btn-responsive {
+    order: 1;
+    position: static !important;
+    align-self: flex-end !important;
+    margin-bottom: 0.2rem !important;
+    top: unset !important;
+    right: unset !important;
+    z-index: 10;
+    filter: none !important;
+  }
+  .proyecto-titulo-cerrar-responsive .fw-bold {
+    order: 2;
+    width: 100% !important;
+    text-align: center !important;
+    font-size: 1.25rem !important;
+    margin-bottom: 0.2rem !important;
+    padding-right: 0 !important;
+    word-break: break-word !important;
   }
 }
 `}
