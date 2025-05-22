@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Suspense, lazy, useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from "firebase/auth";
 import './App.css'
 import "./App.animations.css";
@@ -15,6 +15,8 @@ import MisTareas from "./pages/MisTareas";
 import ProyectosDisponibles from "./pages/ProyectosDisponibles";
 import ProyectosPublicos from "./pages/ProyectosPublicos";
 import { saveUserProfile } from "./firebase/firestore";
+
+const UserProfilePage = lazy(() => import('./pages/UserProfilePage')); // Nueva importación
 
 // Define ProtectedRoute component
 const ProtectedRoute = ({ user, element, setToast }) => {
@@ -58,22 +60,42 @@ function App() {
   };
 
   return (
-    <DarkModeProvider>
-      <Router>
-        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-        <Routes>
-          <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Landing setToast={setToast} />} />
-          <Route path="/dashboard" element={<ProtectedRoute user={user} element={<Dashboard setToast={setToast} />} setToast={setToast} />} />
-          <Route path="/crear-proyecto" element={<ProtectedRoute user={user} element={<CrearProyecto setToast={setToast} />} setToast={setToast} />} />
-          <Route path="/mis-proyectos" element={<ProtectedRoute user={user} element={<MisProyectos />} setToast={setToast} />} />
-          <Route path="/proyecto/:ownerId/:projectId" element={<ProtectedRoute user={user} element={<ProyectoDetalle />} setToast={setToast} />} />
-          <Route path="/mis-tareas" element={<ProtectedRoute user={user} element={<MisTareas />} setToast={setToast} />} />
-          <Route path="/proyectos-disponibles" element={<ProtectedRoute user={user} element={<ProyectosDisponibles />} setToast={setToast} />} />
-          <Route path="/proyectos-publicos" element={<ProyectosPublicos />} />
-        </Routes>
-      </Router>
-    </DarkModeProvider>
+    <Router>
+      <DarkModeProvider>
+          {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+          <main className={`App ${loading ? 'app-loading' : ''}`}>
+            {loading ? (
+              <div className="container d-flex justify-content-center align-items-center min-vh-100">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Cargando...</span>
+                </div>
+              </div>
+            ) : (
+              <Routes>
+                <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Landing setToast={setToast} />} />
+                <Route path="/dashboard" element={<ProtectedRoute user={user} element={<Dashboard setToast={setToast} />} setToast={setToast} />} />
+                <Route path="/crear-proyecto" element={<ProtectedRoute user={user} element={<CrearProyecto setToast={setToast} />} setToast={setToast} />} />
+                <Route path="/mis-proyectos" element={<ProtectedRoute user={user} element={<MisProyectos />} setToast={setToast} />} />
+                <Route path="/proyecto/:ownerId/:projectId" element={<ProtectedRoute user={user} element={<ProyectoDetalle />} setToast={setToast} />} />
+                <Route path="/mis-tareas" element={<ProtectedRoute user={user} element={<MisTareas />} setToast={setToast} />} />
+                <Route path="/proyectos-disponibles" element={<ProtectedRoute user={user} element={<ProyectosDisponibles />} setToast={setToast} />} />
+                <Route path="/proyectos-publicos" element={<ProyectosPublicos />} />
+                <Route path="/proyecto/:id" element={<ProyectoDetalle />} />
+                {/* Ruta para el perfil de usuario */}
+                <Route 
+                  path="/usuario/:userId" 
+                  element={
+                    <Suspense fallback={<div className='w-100 vh-100 d-flex justify-content-center align-items-center'><div className='spinner-border text-primary' role='status'><span className='visually-hidden'>Cargando perfil...</span></div></div>}>
+                      <UserProfilePage />
+                    </Suspense>
+                  }
+                />
+              </Routes>
+            )}
+          </main>
+      </DarkModeProvider>
+    </Router>
   );
 }
 
-export default App
+export default App;

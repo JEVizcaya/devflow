@@ -272,15 +272,15 @@ const ProyectoDetalle = () => {
           <div className="col-12 col-lg-8 mb-3">
             <div className={darkMode ? "card bg-dark text-light border-info shadow-lg" : "card bg-white text-dark border-primary shadow-lg"}>
               <div className="card-body position-relative">
-                <div className={`d-flex align-items-center mb-3 proyecto-titulo-cerrar-responsive`} style={{position: 'relative', minHeight: 48}}>
+                <button
+                  type="button"
+                  className="btn-close position-absolute close-btn-responsive"
+                  aria-label="Cerrar"
+                  onClick={() => navigate(-1)}
+                  style={{ top: '-15px', right: '-15px', zIndex: 10, filter: darkMode ? 'invert(1)' : 'none', opacity: 0.95 }}
+                ></button>
+                <div className={'d-flex align-items-center mb-3 proyecto-titulo-cerrar-responsive'} style={{minHeight: 48}}>
                   <h2 className="fw-bold mb-0 flex-grow-1" style={{wordBreak: 'break-word'}}>{project.title}</h2>
-                  <button
-                    type="button"
-                    className="btn-close position-absolute close-btn-responsive"
-                    aria-label="Cerrar"
-                    onClick={() => navigate(-1)}
-                    style={{ top: 12, right: 16, zIndex: 10, filter: darkMode ? 'invert(1)' : 'none', opacity: 0.95 }}
-                  ></button>
                 </div>
                 <p className="mb-3" style={{fontSize: 18}}>{project.description}</p>
                 {/* Sección de tareas asignadas: ahora en un div externo, no colapsable ni modal */}
@@ -667,8 +667,8 @@ const ProyectoDetalle = () => {
     padding-right: 0.5rem !important;
   }
   .close-btn-responsive {
-    top: 8px !important;
-    right: 8px !important;
+    /* top: 8px !important; */ /* Commented out conflicting style */
+    /* right: 8px !important; */ /* Commented out conflicting style */
   }
   .tareas-asignadas-responsive {
     padding: 1.2rem 0.5rem !important;
@@ -756,13 +756,12 @@ const ProyectoDetalle = () => {
   }
   .proyecto-titulo-cerrar-responsive .close-btn-responsive {
     order: 1;
-    position: static !important;
+    /* position: static !important; */ /* Commented out to allow absolute positioning */
     align-self: flex-end !important;
     margin-bottom: 0.2rem !important;
-    top: unset !important;
-    right: unset !important;
+    /* top: unset !important; */ /* Commented out conflicting style */
+    /* right: unset !important; */ /* Commented out conflicting style */
     z-index: 10;
-    filter: none !important;
   }
   .proyecto-titulo-cerrar-responsive .fw-bold {
     order: 2;
