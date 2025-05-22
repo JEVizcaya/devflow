@@ -389,7 +389,7 @@ const ProyectoDetalle = () => {
                   )}
                   {/* Responsive: menú desplegable para colaborador */}
                   {!isOwner && isCollaborator && (
-                    <div className="d-block d-md-none w-100">
+                    <div className="d-block d-md-none w-100 collab-action-menu-container"> {/* Added collab-action-menu-container */}
                       <ActionMenuColaborador
                         showTasks={showTasks}
                         setShowTasks={setShowTasks}
@@ -405,7 +405,7 @@ const ProyectoDetalle = () => {
                       <div className="d-none d-md-flex" style={{flex: '1 1 170px', minWidth: 170, maxWidth: 220, alignItems: 'center'}}>
                         <button className="btn btn-outline-info w-100" onClick={handleUnirse} disabled><i className="bi bi-person-check"></i> Ya eres colaborador</button>
                       </div>
-                      <div className="d-none d-md-flex" style={{flex: '1 1 170px', minWidth: 170, maxWidth: 220, alignItems: 'center'}}>
+                      <div className="d-none d-md-flex collab-tareas-btn-container" style={{flex: '1 1 170px', minWidth: 170, maxWidth: 220, alignItems: 'center'}}> {/* Added collab-tareas-btn-container */}
                         <button
                           className={darkMode ? "btn btn-outline-light w-100" : "btn btn-outline-primary w-100"}
                           onClick={() => setShowTasks(v => !v)}
@@ -422,7 +422,7 @@ const ProyectoDetalle = () => {
                     <div className="w-100 d-flex justify-content-center align-items-center" style={{margin: '0 auto'}}>
                       <button
                         className={darkMode ? "btn btn-success" : "btn btn-success"}
-                        style={{fontWeight: 600, fontSize: 16, borderRadius: 6, minHeight: 44, maxWidth: 320, width: '100%', maxWidth: 350}}
+                        style={{ fontWeight: 600, fontSize: 16, borderRadius: 6, minHeight: 44, width: '100%', maxWidth: 350 }}
                         onClick={handleUnirse}
                       >
                         <i className="bi bi-person-plus me-2"></i> Unirse como colaborador
@@ -653,6 +653,68 @@ const ProyectoDetalle = () => {
   .acciones-proyecto-responsive {
     flex-direction: column !important;
     gap: 0.5rem !important;
+  }
+
+  /* Ensure parent containers of buttons/menus take full width */
+  .acciones-proyecto-responsive > .project-action-dropdown,
+  .acciones-proyecto-responsive > .d-block.d-md-none, /* Applies to collab-action-menu-container before it's hidden */
+  .acciones-proyecto-responsive > div.order-3.ms-lg-auto {
+    width: 100% !important;
+    min-width: 0 !important; /* Override inline min-width */
+    max-width: 100% !important; /* Override inline max-width */
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Ensure component roots within those containers also take full width */
+  .acciones-proyecto-responsive .action-menu-project-root,
+  .acciones-proyecto-responsive .dropdown { /* Was for ActionMenuColaborador's Dropdown root */
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    display: block !important; /* Important for dropdowns or other non-block roots */
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Ocultar el menú de acciones del colaborador en responsive */
+  .acciones-proyecto-responsive .collab-action-menu-container {
+    display: none !important;
+  }
+
+  /* Mostrar y dar estilos al contenedor del botón 'Tareas asignadas' del colaborador en responsive */
+  .acciones-proyecto-responsive .collab-tareas-btn-container {
+    display: flex !important;
+    align-items: center !important; /* Mantener alineación vertical si el botón no es display block */
+    width: 100% !important;
+    min-width: 0 !important;    /* Sobrescribir estilo en línea */
+    max-width: 100% !important; /* Sobrescribir estilo en línea */
+    flex: none !important;       /* Sobrescribir comportamiento flex en línea */
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Unificación de TAMAÑO para botones de acción y chat en responsive */
+  .acciones-proyecto-responsive .action-menu-project-root > button,
+  .acciones-proyecto-responsive .collab-tareas-btn-container > button, /* Botón 'Tareas asignadas' del colaborador */
+  .acciones-proyecto-responsive .btn-chat-violeta {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 44px !important;
+    font-size: 16px !important; /* Afecta el tamaño del texto, que influye en la percepción del tamaño */
+    border-radius: 6px !important;
+    padding: 12px 16px !important;
+    box-sizing: border-box !important; /* Asegura que padding y border se incluyan en width/height */
   }
 }
 `}
