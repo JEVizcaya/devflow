@@ -81,8 +81,10 @@ const Dashboard = ({ setToast, proyectos }) => {
               <div className={darkMode ? "card bg-dark text-light border-info h-100 shadow" : "card bg-white text-dark border-primary h-100 shadow-sm"} style={darkMode ? { backdropFilter: 'blur(1.5px)' } : {}}>
                 <div className="card-body">
                   <i className="bi bi-check2-square fs-1 mb-3 text-info"></i>
-                  <h5 className="card-title fw-bold">Mis tareas asignadas</h5>
-                  <p className="card-text">Accede rápidamente a todas las tareas en las que eres colaborador y gestiona su estado.</p>
+                  <h5 className="card-title fw-bold">Colaboraciones</h5>
+                  <p className="card-text">
+                    Accede facilmente a los proyectos en los que colaboras y a tus tareas asignadas.
+                  </p>
                 </div>
               </div>
             </Link>

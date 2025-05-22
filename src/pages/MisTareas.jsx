@@ -14,21 +14,35 @@ const MisTareas = () => {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [creadores, setCreadores] = useState({});
+  const [proyectosColaborador, setProyectosColaborador] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchTareas = async () => {
+    const fetchTareasYProyectos = async () => {
       setLoading(true);
       try {
         const db = getFirestore();
-        // Traer todos los proyectos de la colección raíz 'projects'
         const projectsRef = collection(db, "projects");
         const querySnapshot = await getDocs(projectsRef);
         let tareasAsignadas = [];
+        let proyectosColaborador = [];
         let ownerIds = new Set();
         for (const docSnap of querySnapshot.docs) {
           const project = docSnap.data();
           const ownerId = project.ownerId;
+          // Si el usuario es colaborador (pero no owner)
+          if (Array.isArray(project.collaborators) && project.collaborators.includes(user.uid) && ownerId !== user.uid) {
+            proyectosColaborador.push({
+              projectId: docSnap.id,
+              ownerId,
+              projectTitle: project.title,
+              projectDescription: project.description,
+              projectStatus: project.status || '',
+              // Puedes agregar más campos si lo deseas
+            });
+            ownerIds.add(ownerId);
+          }
+          // Tareas asignadas
           if (Array.isArray(project.tasks)) {
             project.tasks.forEach((t, idx) => {
               if (t.assignedTo === user.uid) {
@@ -52,13 +66,14 @@ const MisTareas = () => {
         creadorArr.forEach(c => { if (c) creadorMap[c.uid] = c; });
         setCreadores(creadorMap);
         setTareas(tareasAsignadas);
+        setProyectosColaborador(proyectosColaborador);
       } catch (e) {
         setToast({ message: "Error al cargar tareas", type: "error" });
       } finally {
         setLoading(false);
       }
     };
-    if (user) fetchTareas();
+    if (user) fetchTareasYProyectos();
   }, [user]);
 
   return (
@@ -81,37 +96,69 @@ const MisTareas = () => {
                 <span className="visually-hidden">Cargando...</span>
               </div>
             </div>
-          ) : tareas.length === 0 ? (
-            <div className="alert alert-info">No tienes tareas asignadas como colaborador.</div>
+          ) : tareas.length === 0 && proyectosColaborador.length === 0 ? (
+            <div className="alert alert-info">No participas en ningún proyecto como colaborador.</div>
           ) : (
-            <div className="d-flex flex-column gap-3 mt-3">
-              {tareas.map((t, i) => (
-                <Link
-                  key={i}
-                  to={`/proyecto/${t.ownerId}/${t.projectId}`}
-                  className="text-decoration-none"
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div className={darkMode ? "card bg-secondary bg-opacity-25 border-info text-light mb-2" : "card bg-light border-primary text-dark mb-2"} style={{maxWidth: 880, margin: '0 auto'}}>
-                    <div className="card-body py-2 px-3">
-                      <div className="d-flex justify-content-between align-items-center mb-1">
-                        <span className="fw-bold">{t.title}</span>
-                        <span className={t.status === 'pendiente' ? "badge bg-warning text-dark" : t.status === 'en proceso' ? "badge bg-primary" : "badge bg-success"}>{t.status}</span>
+            <>
+              {tareas.length > 0 && (
+                <div className="d-flex flex-column gap-3 mt-3">
+                  {tareas.map((t, i) => (
+                    <Link
+                      key={i}
+                      to={`/proyecto/${t.ownerId}/${t.projectId}`}
+                      className="text-decoration-none"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className={darkMode ? "card bg-secondary bg-opacity-25 border-info text-light mb-2" : "card bg-light border-primary text-dark mb-2"} style={{maxWidth: 880, margin: '0 auto'}}>
+                        <div className="card-body py-2 px-3">
+                          <div className="d-flex justify-content-between align-items-center mb-1">
+                            <span className="fw-bold">{t.title}</span>
+                            <span className={t.status === 'pendiente' ? "badge bg-warning text-dark" : t.status === 'en proceso' ? "badge bg-primary" : "badge bg-success"}>{t.status}</span>
+                          </div>
+                          <div style={{fontSize: 14}} className="mb-1">{t.description}</div>
+                          <div style={{fontSize: 13}} className={darkMode ? "mb-2" : "text-muted mb-2"}>
+                            <i className="bi bi-kanban me-1"></i>
+                            Proyecto: <span className="fw-semibold">{t.projectTitle}</span>
+                          </div>
+                          <div style={{fontSize: 13}} className={darkMode ? "mb-2" : "text-muted mb-2"}>
+                            <i className="bi bi-person-circle me-1"></i>
+                            Tarea asignada por: <span className="fw-semibold">{creadores[t.ownerId]?.displayName || creadores[t.ownerId]?.githubUsername || creadores[t.ownerId]?.email || 'Desconocido'}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div style={{fontSize: 14}} className="mb-1">{t.description}</div>
-                      <div style={{fontSize: 13}} className={darkMode ? "mb-2" : "text-muted mb-2"}>
-                        <i className="bi bi-kanban me-1"></i>
-                        Proyecto: <span className="fw-semibold">{t.projectTitle}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+              {/* Proyectos donde soy colaborador pero no tengo tareas asignadas */}
+              {proyectosColaborador.length > 0 && (
+                <div className="d-flex flex-column gap-3 mt-4">
+                  <h2 className={darkMode ? "text-info" : "text-primary"}>Proyectos en los que participo como colaborador</h2>
+                  {proyectosColaborador.map((p, i) => (
+                    <Link
+                      key={p.projectId}
+                      to={`/proyecto/${p.ownerId}/${p.projectId}`}
+                      className="text-decoration-none"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className={darkMode ? "card bg-secondary bg-opacity-25 border-info text-light mb-2" : "card bg-light border-primary text-dark mb-2"} style={{maxWidth: 880, margin: '0 auto'}}>
+                        <div className="card-body py-2 px-3">
+                          <div className="d-flex justify-content-between align-items-center mb-1">
+                            <span className="fw-bold">{p.projectTitle}</span>
+                            {/* Puedes mostrar el estado del proyecto si lo tienes */}
+                          </div>
+                          <div style={{fontSize: 14}} className="mb-1">{p.projectDescription}</div>
+                          <div style={{fontSize: 13}} className={darkMode ? "mb-2" : "text-muted mb-2"}>
+                            <i className="bi bi-person-circle me-1"></i>
+                            Creador: <span className="fw-semibold">{creadores[p.ownerId]?.displayName || creadores[p.ownerId]?.githubUsername || creadores[p.ownerId]?.email || 'Desconocido'}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div style={{fontSize: 13}} className={darkMode ? "mb-2" : "text-muted mb-2"}>
-                        <i className="bi bi-person-circle me-1"></i>
-                        Tarea asignada por: <span className="fw-semibold">{creadores[t.ownerId]?.displayName || creadores[t.ownerId]?.githubUsername || creadores[t.ownerId]?.email || 'Desconocido'}</span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </section>
       </main>
