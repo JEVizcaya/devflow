@@ -143,11 +143,12 @@ const MisTareas = () => {
                 </div>
               )}
               {/* Proyectos donde soy colaborador pero no tengo tareas asignadas */}
-              <h2 className={darkMode ? "fw-bold text-info mb-2 text-center" : "fw-bold text-primary mb-2 text-center"}>Proyectos en los que participo como colaborador</h2>
+              <h2 className={darkMode ? "fw-bold text-info mb-2 text-center mt-5 mb-4" : "fw-bold text-primary mb-2 text-center mt-5 mb-4"}>Proyectos en los que participo como colaborador</h2>
+              <div style={{height: 32}} />
               {proyectosColaborador.length === 0 ? (
                 <div className="alert alert-info">No colaboras en ningún proyecto.</div>
               ) : (
-                <div className="d-flex flex-column gap-3 mt-4">
+                <div className="d-flex flex-column gap-3 mt-4 mb-5 pb-5">
                   {proyectosColaborador.map((p, i) => (
                     <Link
                       key={p.projectId}
