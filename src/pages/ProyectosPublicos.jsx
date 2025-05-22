@@ -120,7 +120,6 @@ const ProyectosPublicos = () => {
                     {/* Mostrar solo los 6 últimos proyectos en 2 filas de 3 columnas */}
                     <div className="row w-100 justify-content-center g-4" style={{ marginLeft: 0, marginRight: 0, marginTop: 8 }}>
                         {proyectos.slice(0, 6).map((p, idx) => {
-                            const owner = usuarios.find((u) => u.uid === p.ownerId);
                             let fecha = "";
                             if (p.createdAt) {
                                 try {
@@ -143,25 +142,21 @@ const ProyectosPublicos = () => {
                                             <div>
                                                 <h5 className="card-title fw-bold mb-2">{p.title}</h5>
                                                 <p className="card-text mb-2" style={{ minHeight: 48, wordBreak: 'break-word' }}>{p.description}</p>
-                                                <div className="mb-2 d-flex flex-row align-items-center justify-content-center w-100" style={{ gap: 12 }}>
-                                                    <span className={p.isPublic ? "badge bg-success ms-1" : "badge bg-danger ms-1"}>
-                                                        {p.isPublic ? "Público" : "Privado"}
-                                                    </span>
-                                                    {fecha && (
-                                                        <span className="badge bg-light text-dark border border-secondary ms-1" style={{ fontSize: "0.95em", opacity: 0.85 }}>
+                                                
+                                                {/* Fecha - Centered */}
+                                                {fecha && (
+                                                    <div className="mb-2 text-center">
+                                                        <span className="badge bg-light text-dark border border-secondary" style={{ fontSize: "0.95em", opacity: 0.85 }}> {/* Removed ms-1 */}
                                                             <i className="bi bi-calendar-event me-1"></i> {fecha}
                                                         </span>
-                                                    )}
-                                                </div>
-                                                <div className="mb-2">
-                                                    <b>Creador:</b>{" "}
-                                                    {owner ? (
-                                                        <span className="badge bg-info text-dark ms-1">
-                                                            <i className="bi bi-person-badge me-1"></i>{owner.displayName || owner.githubUsername || owner.email}
-                                                        </span>
-                                                    ) : (
-                                                        <span className="text-muted">Desconocido</span>
-                                                    )}
+                                                    </div>
+                                                )}
+
+                                                {/* Estado (Public/Private) - Last and Centered */}
+                                                <div className="mb-2 text-center">
+                                                    <span className={p.isPublic ? "badge bg-success" : "badge bg-danger"}> {/* Removed ms-1 */}
+                                                        {p.isPublic ? "Público" : "Privado"}
+                                                    </span>
                                                 </div>
                                                
                                             </div>

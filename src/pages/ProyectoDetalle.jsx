@@ -329,7 +329,7 @@ const ProyectoDetalle = () => {
                                       <>
                                         <span className="fw-semibold" style={darkMode ? { color: '#fff' } : {}}>Tarea asignada por:</span>
                                         <span style={darkMode ? { color: '#fff', fontWeight: 600, marginLeft: 4 } : { fontWeight: 600, marginLeft: 4 }}>
-                                          {owner ? (owner.displayName || owner.githubUsername || owner.email) : 'Creador desconocido'}
+                                          {owner ? (owner.githubUsername || owner.displayName || owner.email) : 'Creador desconocido'}
                                         </span>
                                       </>
                                     )
@@ -463,7 +463,7 @@ const ProyectoDetalle = () => {
                       <option value="">Asignar a...</option>
                       {collaboratorsInfo && collaboratorsInfo.map((user) => (
                         <option key={user.uid} value={user.uid}>
-                          {user.displayName || user.githubUsername || user.email}
+                          {user.githubUsername || user.displayName || user.uid}
                         </option>
                       ))}
                     </select>
@@ -530,7 +530,7 @@ const ProyectoDetalle = () => {
                         <option value="">Asignar a...</option>
                         {collaboratorsInfo && collaboratorsInfo.map((user) => (
                           <option key={user.uid} value={user.uid}>
-                            {user.displayName || user.githubUsername || user.email}
+                            {user.githubUsername || user.displayName || user.uid}
                           </option>
                         ))}
                       </select>
