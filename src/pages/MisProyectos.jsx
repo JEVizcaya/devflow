@@ -71,18 +71,41 @@ const MisProyectos = () => {
 
   if (loading)
     return (
-      <div className="container d-flex justify-content-center align-items-center min-vh-100">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Cargando...</span>
+      <div className="container d-flex flex-column align-items-center justify-content-center min-vh-100 w-100" style={darkMode ? darkBg : lightBg}>
+        <NavBar />
+        <div className="d-flex justify-content-center align-items-center flex-grow-1 w-100" style={{minHeight: 300}}>
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
         </div>
       </div>
     );
   if (error)
-    return <div className="alert alert-danger text-center my-5">{error}</div>;
+    return <div className="d-flex flex-column align-items-center justify-content-center min-vh-100 w-100" style={darkMode ? darkBg : lightBg}><NavBar /><div className="alert alert-danger text-center my-5">{error}</div></div>;
   if (proyectos.length === 0)
     return (
-      <div className="alert alert-info text-center my-5">
-        No tienes proyectos aún.
+      <div className="d-flex flex-column align-items-center justify-content-center px-2 w-100" style={darkMode ? darkBg : lightBg}>
+        <NavBar />
+        <main className="flex-grow-1 d-flex flex-column align-items-center justify-content-center w-100 px-0" style={{ width: "100%", maxWidth: 1200 }}>
+          <section className={`rounded-4 shadow-lg p-3 p-md-5 text-center mb-4 w-100 ${darkMode ? "bg-dark bg-opacity-75 border border-info text-light" : "bg-white border border-primary text-dark"}`} style={{ width: "100%", maxWidth: 1000, minWidth: 0, backdropFilter: darkMode ? "blur(2px)" : undefined, position: "relative" }}>
+            <button
+              type="button"
+              className="btn-close position-absolute"
+              aria-label="Cerrar"
+              onClick={() => navigate("/dashboard")}
+              style={{ top: 16, right: 16, zIndex: 10, ...(darkMode ? { filter: 'invert(1)', opacity: 0.95 } : {}) }}
+            ></button>
+            <div className="d-flex flex-row justify-content-between align-items-center mb-4" style={{position: 'relative'}}>
+              <h2 className={darkMode ? "fw-bold mb-0 text-info w-100 text-center" : "fw-bold mb-0 text-primary w-100 text-center"} style={{flex: 1, marginBottom: 0}}>
+                Mis proyectos
+              </h2>
+            </div>
+            <div style={{ height: 24 }} />
+            <div className="alert alert-info text-center my-5">
+              No tienes proyectos aún.
+            </div>
+          </section>
+        </main>
       </div>
     );
 
