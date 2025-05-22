@@ -131,7 +131,7 @@ const MisTareas = () => {
                           </div>
                           <div style={{fontSize: 13}} className={darkMode ? "mb-3" : "text-muted mb-3"}>
                             <i className="bi bi-person-circle me-1"></i>
-                            Tarea asignada por: <span className="fw-semibold">{creadores[t.ownerId]?.displayName || creadores[t.ownerId]?.githubUsername || creadores[t.ownerId]?.email || 'Desconocido'}</span>
+                            Tarea asignada por: <span className="fw-semibold">{creadores[t.ownerId]?.githubUsername || creadores[t.ownerId]?.displayName || creadores[t.ownerId]?.email || 'Desconocido'}</span>
                           </div>
                           <div className="w-100 d-flex justify-content-center mt-2">
                             <span className={t.status === 'pendiente' ? "badge bg-warning text-dark" : t.status === 'en proceso' ? "badge bg-primary" : "badge bg-success"} style={{fontSize: 13}}>{t.status}</span>
@@ -165,7 +165,7 @@ const MisTareas = () => {
                           <div style={{fontSize: 15}} className="mb-3 text-center">{p.projectDescription}</div>
                           <div style={{fontSize: 13}} className={darkMode ? "mb-1" : "text-muted mb-1"}>
                             <i className="bi bi-person-circle me-1"></i>
-                            Creador: <span className="fw-semibold">{creadores[p.ownerId]?.displayName || creadores[p.ownerId]?.githubUsername || creadores[p.ownerId]?.email || 'Desconocido'}</span>
+                            Creador: <span className="fw-semibold">{creadores[p.ownerId]?.githubUsername || creadores[p.ownerId]?.displayName || creadores[p.ownerId]?.email || 'Desconocido'}</span>
                           </div>
                         </div>
                       </div>

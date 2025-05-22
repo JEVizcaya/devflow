@@ -136,7 +136,7 @@ const MisProyectos = () => {
             type="button"
             className="btn-close position-absolute"
             aria-label="Cerrar"
-            onClick={() => window.history.back()}
+            onClick={() => navigate("/dashboard")}
             style={{ top: 16, right: 16, zIndex: 10, ...(darkMode ? { filter: 'invert(1)', opacity: 0.95 } : {}) }}
           ></button>
           {/* Fin botón X */}
