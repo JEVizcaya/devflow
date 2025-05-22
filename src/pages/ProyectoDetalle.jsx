@@ -283,7 +283,13 @@ const ProyectoDetalle = () => {
                 <p className="mb-3" style={{fontSize: 18}}>{project.description}</p>
                 {/* Sección de tareas asignadas: ahora en un div externo, no colapsable ni modal */}
                 {showTasks && (
-                  <div className="my-4 p-4 rounded-3 shadow border" style={darkMode ? {background: '#232526', borderColor: '#0dcaf0', color: '#fff', maxWidth: 700, margin: '0 auto'} : {background: '#f8fafc', borderColor: '#0d6efd', color: '#222', maxWidth: 700, margin: '0 auto'}}>
+                  <div
+                    className="my-4 p-4 rounded-3 shadow border tareas-asignadas-responsive"
+                    style={darkMode
+                      ? { background: '#232526', borderColor: '#0dcaf0', color: '#fff', maxWidth: 700, margin: '0 auto' }
+                      : { background: '#f8fafc', borderColor: '#0d6efd', color: '#222', maxWidth: 700, margin: '0 auto' }
+                    }
+                  >
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <h5 className={darkMode ? "text-info mb-0" : "text-primary mb-0"}><i className="bi bi-list-task me-2"></i>Tareas asignadas</h5>
                       <button
@@ -367,7 +373,7 @@ const ProyectoDetalle = () => {
                 {/* Fin sección tareas asignadas */}
                 {/* Eliminar datos de repo, público/privado, fecha y colaboradores de los detalles */}
                 {/* Acciones según rol */}
-                <div className="d-flex flex-wrap gap-2 mt-4 position-relative align-items-stretch" style={{minHeight: 48}}>
+                <div className="d-flex flex-wrap gap-2 mt-4 position-relative align-items-stretch acciones-proyecto-responsive">
                   {/* Menú de acciones para el owner */}
                   {isOwner && (
                     <div style={{position: 'relative', zIndex: 2, minWidth: 170, maxWidth: 220, display: 'flex', alignItems: 'center'}} className="project-action-dropdown order-1 mb-2 mb-lg-0">
@@ -381,30 +387,35 @@ const ProyectoDetalle = () => {
                       />
                     </div>
                   )}
-                  {/* Si no es owner ni colaborador, botón unirse */}
-                  {!isOwner && !isCollaborator && (
-                    <div style={{flex: '1 1 170px', minWidth: 170, maxWidth: 220, display: 'flex', alignItems: 'center'}} className="order-3 mb-2 mb-lg-0">
-                      <button className="btn btn-outline-info w-100" onClick={handleUnirse}><i className="bi bi-person-plus"></i> Unirse como colaborador</button>
+                  {/* Responsive: menú desplegable para colaborador */}
+                  {!isOwner && isCollaborator && (
+                    <div className="d-block d-md-none w-100">
+                      <ActionMenuColaborador
+                        showTasks={showTasks}
+                        setShowTasks={setShowTasks}
+                        handleUnirse={handleUnirse}
+                        isCollaborator={isCollaborator}
+                        darkMode={darkMode}
+                      />
                     </div>
                   )}
-                  {/* Si es colaborador pero no owner, botón ya eres colaborador */}
-                  {isCollaborator && !isOwner && (
-                    <div style={{flex: '1 1 170px', minWidth: 170, maxWidth: 220, display: 'flex', alignItems: 'center'}} className="order-1 mb-2 mb-lg-0">
-                      <button className="btn btn-outline-info w-100" onClick={handleUnirse} disabled><i className="bi bi-person-check"></i> Ya eres colaborador</button>
-                    </div>
-                  )}
-                  {/* Botón para mostrar tareas asignadas solo para colaboradores (no owner) */}
-                  {isCollaborator && !isOwner && (
-                    <div style={{flex: '1 1 170px', minWidth: 170, maxWidth: 220, display: 'flex', alignItems: 'center'}} className="order-2 mb-2 mb-lg-0">
-                      <button
-                        className={darkMode ? "btn btn-outline-light w-100" : "btn btn-outline-primary w-100"}
-                        onClick={() => setShowTasks(v => !v)}
-                        style={{fontWeight: 600, letterSpacing: 0.5, fontSize: 15, borderRadius: 6, minHeight: 40}}
-                      >
-                        <i className={showTasks ? "bi bi-x-lg me-2" : "bi bi-list-task me-2"}></i>
-                        {showTasks ? "Ocultar tareas asignadas" : "Tareas asignadas"}
-                      </button>
-                    </div>
+                  {/* Botones individuales solo en escritorio */}
+                  {!isOwner && isCollaborator && (
+                    <>
+                      <div className="d-none d-md-flex" style={{flex: '1 1 170px', minWidth: 170, maxWidth: 220, alignItems: 'center'}}>
+                        <button className="btn btn-outline-info w-100" onClick={handleUnirse} disabled><i className="bi bi-person-check"></i> Ya eres colaborador</button>
+                      </div>
+                      <div className="d-none d-md-flex" style={{flex: '1 1 170px', minWidth: 170, maxWidth: 220, alignItems: 'center'}}>
+                        <button
+                          className={darkMode ? "btn btn-outline-light w-100" : "btn btn-outline-primary w-100"}
+                          onClick={() => setShowTasks(v => !v)}
+                          style={{fontWeight: 600, letterSpacing: 0.5, fontSize: 15, borderRadius: 6, minHeight: 40}}
+                        >
+                          <i className={showTasks ? "bi bi-x-lg me-2" : "bi bi-list-task me-2"}></i>
+                          {showTasks ? "Ocultar tareas asignadas" : "Tareas asignadas"}
+                        </button>
+                      </div>
+                    </>
                   )}
                   {/* Botón chat fuera del menú, separado horizontalmente en escritorio */}
                   {(isOwner || isCollaborator) && (
@@ -590,7 +601,7 @@ const ProyectoDetalle = () => {
   color: #fd7e14 !important;
   transition: color 0.15s;
 }
-.btn-chat-violeta:hover .action-violeta-icon, .btn-chat-violeta:focus .action-violeta-icon {
+.btn-chat-violeta:hover .action-violeta-icon, .btn-chat_violeta:focus .action-violeta-icon {
   color: #fff !important;
 }
 .btn-outline-light.btn-chat-violeta, .btn-outline-light.btn-chat-violeta .chat-violeta-text, .btn-outline-light.btn-chat-violeta .action-violeta-icon {
@@ -616,6 +627,21 @@ const ProyectoDetalle = () => {
   background: #6c757d !important;
   color: #fff !important;
   border-color: #6c757d !important;
+}
+@media (max-width: 768px) {
+  .tareas-asignadas-responsive {
+    padding: 1.2rem 0.5rem !important;
+    margin-left: -8px !important;
+    margin-right: -8px !important;
+    border-radius: 12px !important;
+    max-width: 98vw !important;
+    min-width: 0 !important;
+    box-shadow: 0 2px 12px #0003 !important;
+  }
+  .acciones-proyecto-responsive {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
 }
 `}
 </style>
@@ -722,6 +748,33 @@ function ActionMenuProject({ onAssignTask, onEditProject, onDeleteProject, onSho
             style={{fontWeight: 500, color: '#ffc107'}} // amarillo
             onClick={() => { setOpen(false); onShowTasks(); }}
           >
+            <i className={showTasks ? "bi bi-x-lg" : "bi bi-list-task"}></i> {showTasks ? "Ocultar tareas asignadas" : "Tareas asignadas"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ActionMenuColaborador({ showTasks, setShowTasks, handleUnirse, isCollaborator, darkMode }) {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <div className="dropdown w-100" style={{maxWidth: 400, margin: '0 auto'}}>
+      <button
+        className={darkMode ? "btn btn-outline-light w-100 d-flex justify-content-between align-items-center" : "btn btn-outline-primary w-100 d-flex justify-content-between align-items-center"}
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        style={{fontWeight: 600, fontSize: 16, borderRadius: 6, minHeight: 44}}
+      >
+        <span><i className="bi bi-sliders me-2"></i>Acciones</span>
+        <i className={open ? "bi bi-caret-up-fill" : "bi bi-caret-down-fill"}></i>
+      </button>
+      {open && (
+        <div className={darkMode ? "dropdown-menu show w-100 p-0 border-0 shadow bg-dark text-light" : "dropdown-menu show w-100 p-0 border-0 shadow bg-white text-dark"} style={{borderRadius: 8, marginTop: 4, overflow: 'hidden', minWidth: 0}}>
+          <button className="dropdown-item d-flex align-items-center gap-2" style={{fontWeight: 500}} onClick={handleUnirse} disabled>
+            <i className="bi bi-person-check"></i> Ya eres colaborador
+          </button>
+          <button className="dropdown-item d-flex align-items-center gap-2" style={{fontWeight: 500}} onClick={() => setShowTasks(v => !v)}>
             <i className={showTasks ? "bi bi-x-lg" : "bi bi-list-task"}></i> {showTasks ? "Ocultar tareas asignadas" : "Tareas asignadas"}
           </button>
         </div>
