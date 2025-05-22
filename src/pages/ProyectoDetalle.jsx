@@ -773,6 +773,12 @@ const ProyectoDetalle = () => {
     padding-right: 0 !important;
     word-break: break-word !important;
   }
+
+  .acciones-proyecto-responsive .collab-tareas-btn-container > button {
+    justify-content: flex-start !important;
+    text-align: left !important;
+    padding-left: 18px !important;
+  }
 }
 `}
 </style>
