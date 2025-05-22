@@ -10,15 +10,15 @@ const TusFlujos = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
     const fetchProjects = async () => {
       setLoading(true);
-      const colRef = collection(db, "users", user.uid, "projects");
+      // Cambiar para leer de la colección raíz 'projects', no de users/{uid}/projects
+      const colRef = collection(db, "projects");
       const snap = await getDocs(colRef);
       const projectsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setProjects(projectsData);
-      // Obtener datos de los creadores (en este caso solo el usuario actual, pero preparado para más)
-      const ownerUids = Array.from(new Set(projectsData.map(p => p.ownerId || user.uid)));
+      // Obtener datos de los creadores
+      const ownerUids = Array.from(new Set(projectsData.map(p => p.ownerId)));
       const ownersData = {};
       await Promise.all(ownerUids.map(async (uid) => {
         ownersData[uid] = await getUserProfile(uid);

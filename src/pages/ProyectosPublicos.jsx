@@ -35,7 +35,14 @@ const ProyectosPublicos = () => {
                 setProyectos(proyectosData);
                 // Obtener usuarios únicos
                 const uids = Array.from(new Set(proyectosData.map((p) => p.ownerId)));
-                const usuariosData = await Promise.all(uids.map((uid) => getUserProfile(uid)));
+                const usuariosData = await Promise.all(uids.map(async (uid) => {
+                  try {
+                    return await getUserProfile(uid);
+                  } catch (err) {
+                    // Si falla, retorna null y sigue
+                    return null;
+                  }
+                }));
                 setUsuarios(usuariosData.filter(Boolean));
             } catch (e) {
                 setError("Error al cargar proyectos públicos");
