@@ -10,16 +10,14 @@
   "lang": "es",
   "icons": [
     {
-      "src": "/iconos/landing-illustration.svg",
+      "src": "iconos/devflow_cuadrado_512x512.png.",
       "sizes": "512x512",
-      "type": "image/svg+xml"
-      
+      "type": "image/png"
     },
     {
-      "src": "/iconos/landing-illustration.svg",
+      "src": "/iconos/devflow_cuadrado_192x192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml"
-      
+      "type": "image/png"
     }
   ]
 }
