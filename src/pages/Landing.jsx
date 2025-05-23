@@ -91,9 +91,7 @@ const Landing = ({ setToast }) => {
                     Proyectos públicos
                   </h5>
                   <p className={darkMode ? "lead text-light-50 mb-2" : "lead text-muted mb-2"} style={{fontSize: '1.05rem'}}>
-                    Explora proyectos públicos de la comunidad.
-                    <br />
-                    Contribuye y aprende de los flujos de trabajo de otros desarrolladores.
+                    Descubre proyectos públicos compartidos por la comunidad y visualiza sus detalles básicos.
                   </p>
                 </div>
               </div>

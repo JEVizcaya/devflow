@@ -197,7 +197,7 @@ const ProyectosDisponibles = () => {
                                                         ) : null;
                                                       })
                                                     ) : (
-                                                      <span className="text-muted">Ninguno</span>
+                                                      <span className={darkMode ? "text-light" : "text-muted"}>Ninguno</span>
                                                     )}
                                                   </div>
                                                   {/* Botón de repositorio y Ver detalle alineados horizontalmente y centrados */}
