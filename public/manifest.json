@@ -10,7 +10,7 @@
   "lang": "es",
   "icons": [
     {
-      "src": "iconos/devflow_cuadrado_512x512.png.",
+      "src": "/iconos/devflow_cuadrado_512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     },
