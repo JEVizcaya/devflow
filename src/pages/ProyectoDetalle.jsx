@@ -34,6 +34,7 @@ const ProyectoDetalle = () => {
   const navigate = useNavigate();
   const { darkMode } = useDarkMode();
   const user = getAuth().currentUser;
+  const [editTaskLock, setEditTaskLock] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -230,6 +231,9 @@ const ProyectoDetalle = () => {
   };
 
   const handleOpenEditTask = (idx) => {
+    if (editTaskIdx !== null || editTaskLock) return;
+    setEditTaskLock(true);
+    setTimeout(() => setEditTaskLock(false), 400); // lock de 400ms para evitar doble click rápido
     const t = project.tasks[idx];
     setEditTaskIdx(idx);
     setEditTaskTitle(t.title);
@@ -237,7 +241,10 @@ const ProyectoDetalle = () => {
     setEditTaskAssignee(t.assignedTo);
     setEditTaskStatus(t.status);
   };
-  const handleCloseEditTask = () => setEditTaskIdx(null);
+  const handleCloseEditTask = () => {
+    setEditTaskIdx(null);
+    setEditTaskLock(false);
+  };
 
   const handleSaveEditTask = async () => {
     if (!editTaskTitle || !editTaskAssignee) return;
@@ -309,9 +316,11 @@ const ProyectoDetalle = () => {
                           return (
                             <div key={idx} className={darkMode ? "card bg-secondary bg-opacity-25 border-info text-light" : "card bg-light border-primary text-dark"} style={{marginBottom: 4, position: 'relative'}}>
                               <div className="card-body py-2 px-3">
-                                <div className="d-flex justify-content-between align-items-center mb-1">
-                                  <span className="fw-bold">{task.title}</span>
-                                  <span className={task.status === 'pendiente' ? "badge bg-warning text-dark" : task.status === 'en proceso' ? "badge bg-primary" : "badge bg-success"}>{task.status}</span>
+                                <div className="d-flex flex-column align-items-center mb-1"> {/* Changed from d-flex justify-content-between align-items-center */}
+                                  {/* Status appears first, centered, with bottom margin */}
+                                  <span className={`${task.status === 'pendiente' ? "badge bg-warning text-dark" : task.status === 'en proceso' ? "badge bg-primary" : "badge bg-success"} mb-1`}>{task.status}</span>
+                                  {/* Title appears second, centered */}
+                                  <span className="fw-bold text-center">{task.title}</span>
                                 </div>
                                 <div style={{fontSize: 14}} className="mb-1">{task.description}</div>
                                 <div style={{fontSize: 13}} className={darkMode ? "mb-2" : "text-muted mb-2"}>
@@ -321,16 +330,21 @@ const ProyectoDetalle = () => {
                                       <>
                                         <span className="fw-semibold" style={darkMode ? { color: '#fff' } : {}}>Tarea asignada a:</span>
                                         <span style={darkMode ? { color: '#fff', fontWeight: 600, marginLeft: 4 } : { fontWeight: 600, marginLeft: 4 }}>
-                                          {assignedColab ? (assignedColab.displayName || assignedColab.githubUsername || assignedColab.email) : 'Sin asignar'}
+                                          {assignedColab ? (assignedColab.githubUsername || assignedColab.displayName || assignedColab.email) : 'Sin asignar'}
                                         </span>
                                       </>
                                     )
                                     : (
                                       <>
-                                        <span className="fw-semibold" style={darkMode ? { color: '#fff' } : {}}>Tarea asignada por:</span>
+                                        <span className="fw-semibold" style={darkMode ? { color: '#fff' } : {}}>Tarea asignada por</span>
                                         <span style={darkMode ? { color: '#fff', fontWeight: 600, marginLeft: 4 } : { fontWeight: 600, marginLeft: 4 }}>
                                           {owner ? (owner.githubUsername || owner.displayName || owner.email) : 'Creador desconocido'}
                                         </span>
+                                        {assignedColab && assignedColab.uid !== user?.uid && (
+                                          <span style={darkMode ? { color: '#fff', fontWeight: 600, marginLeft: 4 } : { fontWeight: 600, marginLeft: 4 }}>
+                                          a {assignedColab.githubUsername || assignedColab.displayName || assignedColab.email}
+                                          </span>
+                                        )}
                                       </>
                                     )
                                   }
@@ -510,42 +524,7 @@ const ProyectoDetalle = () => {
                     </form>
                   </div>
                 )}
-                {/* Formulario para editar tarea */}
-                {editTaskIdx !== null && (
-                  <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{background: 'rgba(0,0,0,0.45)', zIndex: 9999}}>
-                    <div className={darkMode ? "bg-dark text-light border-info" : "bg-white text-dark border-primary"} style={{border: '2px solid', borderRadius: 16, minWidth: 0, width: '95vw', maxWidth: 380, boxShadow: '0 4px 32px #0008', padding: 32, margin: 8, boxSizing: 'border-box'}}>
-                      <div className="d-flex justify-content-between align-items-center mb-3">
-                        <h5 className={darkMode ? "text-info mb-0" : "text-primary mb-0"}><i className="bi bi-pencil-square me-2"></i>Editar tarea</h5>
-                        <button
-                          type="button"
-                          className="btn-close"
-                          aria-label="Cerrar"
-                          onClick={handleCloseEditTask}
-                          style={darkMode ? { filter: 'invert(1)', opacity: 0.95 } : {}}
-                        ></button>
-                      </div>
-                      <input type="text" className="form-control mb-2" placeholder="Título de la tarea" value={editTaskTitle} onChange={e => setEditTaskTitle(e.target.value)} />
-                      <textarea className="form-control mb-2" placeholder="Descripción" value={editTaskDesc} onChange={e => setEditTaskDesc(e.target.value)} rows={2} />
-                      <select className="form-select mb-2" value={editTaskAssignee} onChange={e => setEditTaskAssignee(e.target.value)}>
-                        <option value="">Asignar a...</option>
-                        {collaboratorsInfo && collaboratorsInfo.map((user) => (
-                          <option key={user.uid} value={user.uid}>
-                            {user.githubUsername || user.displayName || user.uid}
-                          </option>
-                        ))}
-                      </select>
-                      <select className="form-select mb-3" value={editTaskStatus} onChange={e => setEditTaskStatus(e.target.value)}>
-                        <option value="pendiente">Pendiente</option>
-                        <option value="en proceso">En proceso</option>
-                        <option value="finalizada">Finalizada</option>
-                      </select>
-                      <div className="d-flex justify-content-end gap-2">
-                        <button className="btn btn-secondary" onClick={handleCloseEditTask}>Cancelar</button>
-                        <button className="btn btn-success" onClick={handleSaveEditTask} disabled={!editTaskTitle || !editTaskAssignee || updatingTask}>{updatingTask ? "Guardando..." : "Guardar cambios"}</button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                {/* Fin formulario editar proyecto */}
               </div>
             </div>
           </div>
@@ -563,6 +542,43 @@ const ProyectoDetalle = () => {
           )}
         </section>
       </main>
+      {/* MODAL EDITAR TAREA: SOLO UNA INSTANCIA GLOBAL */}
+      {editTaskIdx !== null && (
+        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center modal-editar-tarea-global" style={{background: 'rgba(0,0,0,0.45)', zIndex: 9999}}>
+          <div className={darkMode ? "bg-dark text-light border-info" : "bg-white text-dark border-primary"} style={{border: '2px solid', borderRadius: 16, minWidth: 0, width: '95vw', maxWidth: 380, boxShadow: '0 4px 32px #0008', padding: 32, margin: 8, boxSizing: 'border-box'}}>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h5 className={darkMode ? "text-info mb-0" : "text-primary mb-0"}><i className="bi bi-pencil-square me-2"></i>Editar tarea</h5>
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Cerrar"
+                onClick={handleCloseEditTask}
+                style={darkMode ? { filter: 'invert(1)', opacity: 0.95 } : {}}
+              ></button>
+            </div>
+            <input type="text" className="form-control mb-2" placeholder="Título de la tarea" value={editTaskTitle} onChange={e => setEditTaskTitle(e.target.value)} />
+            <textarea className="form-control mb-2" placeholder="Descripción" value={editTaskDesc} onChange={e => setEditTaskDesc(e.target.value)} rows={2} />
+            <select className="form-select mb-2" value={editTaskAssignee} onChange={e => setEditTaskAssignee(e.target.value)}>
+              <option value="">Asignar a...</option>
+              {collaboratorsInfo && collaboratorsInfo.map((user) => (
+                <option key={user.uid} value={user.uid}>
+                  {user.githubUsername || user.displayName || user.uid}
+                </option>
+              ))}
+            </select>
+            <select className="form-select mb-3" value={editTaskStatus} onChange={e => setEditTaskStatus(e.target.value)}>
+              <option value="pendiente">Pendiente</option>
+              <option value="en proceso">En proceso</option>
+              <option value="finalizada">Finalizada</option>
+            </select>
+            <div className="d-flex justify-content-end gap-2">
+              <button className="btn btn-secondary" onClick={handleCloseEditTask}>Cancelar</button>
+              <button className="btn btn-success" onClick={handleSaveEditTask} disabled={!editTaskTitle || !editTaskAssignee || updatingTask}>{updatingTask ? "Guardando..." : "Guardar cambios"}</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* FIN MODAL EDITAR TAREA */}
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       {showDeleteConfirm && (
         <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{background: 'rgba(0,0,0,0.45)', zIndex: 9999}}>
@@ -810,18 +826,19 @@ function ActionMenu({ onEdit, onDelete, darkMode }) {
         <div
           className={darkMode ? "dropdown-menu show p-0 border-0 shadow bg-dark text-light" : "dropdown-menu show p-0 border-0 shadow bg-white text-dark"}
           style={{position: 'absolute', right: 0, top: 32, minWidth: 120, zIndex: 10, borderRadius: 8, overflow: 'hidden'}}
+          onClick={e => e.stopPropagation()}
         >
           <button
             className="dropdown-item d-flex align-items-center gap-2"
             style={{fontWeight: 500, color: darkMode ? '#a97c50' : '#a97c50'}}
-            onClick={() => { setOpen(false); onEdit(); }}
+            onClick={e => { e.stopPropagation(); setOpen(false); onEdit(); }}
           >
             <i className="bi bi-pencil-fill"></i> Editar
           </button>
           <button
             className="dropdown-item d-flex align-items-center gap-2"
             style={{fontWeight: 500, color: '#dc3545'}}
-            onClick={() => { setOpen(false); onDelete(); }}
+            onClick={e => { e.stopPropagation(); setOpen(false); onDelete(); }}
           >
             <i className="bi bi-trash-fill"></i> Eliminar
           </button>
